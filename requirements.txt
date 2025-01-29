@@ -1,0 +1,6 @@
+docker
+mininet
+tkinter
+docker-py
+comnetsemu
+ryu
