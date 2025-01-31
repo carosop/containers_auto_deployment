@@ -11,7 +11,7 @@ class MyTopo:
         s2 = net.addSwitch("s2", protocols="OpenFlow13", stp=True)
         s3 = net.addSwitch("s3", protocols="OpenFlow13", stp=True)
         s4 = net.addSwitch("s4", protocols="OpenFlow13", stp=True)
-        s5 = net.addSwitch("s5", protocols="OpenFlow13", stp=True)
+        #s5 = net.addSwitch("s5", protocols="OpenFlow13", stp=True)
 
         # Docker hosts
         h1 = net.addDockerHost("h1", ip="10.0.0.1", dimage="dev_test", docker_args={"hostname": "h1"})
@@ -21,7 +21,7 @@ class MyTopo:
         h5 = net.addDockerHost("h5", ip="10.0.0.5", dimage="dev_test", docker_args={"hostname": "h5"})
         h6 = net.addDockerHost("h6", ip="10.0.0.6", dimage="dev_test", docker_args={"hostname": "h6"})
         # External host
-        external = net.addHost("external", ip="10.0.0.7")
+        #external = net.addHost("external", ip="10.0.0.7")
 
         # Links
         net.addLink(h1, s1, cls=TCLink, bw=50, delay="10ms")
@@ -34,8 +34,8 @@ class MyTopo:
         net.addLink(s1, s2, cls=TCLink, bw=100, delay="5ms")
         net.addLink(s2, s3, cls=TCLink, bw=100, delay="5ms")
         net.addLink(s3, s4, cls=TCLink, bw=100, delay="5ms")
-        net.addLink(s4, s5, cls=TCLink, bw=100, delay="5ms")
-        net.addLink(external, s5, cls=TCLink, bw=50, delay="10ms")
+        #net.addLink(s4, s5, cls=TCLink, bw=100, delay="5ms")
+        #net.addLink(external, s5, cls=TCLink, bw=50, delay="10ms")
 
 def start_ryu_controller():
     """

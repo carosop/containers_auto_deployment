@@ -7,12 +7,11 @@ from mininet.log import setLogLevel, info
 from mininet.link import TCLink
 from gui import ServiceDeployGUI
 from network import MyTopo, start_ryu_controller
-from services import setup_docker_images, cleanup_containers
+from services import setup_docker_images, cleanup_containers, container_counter
 
 def start():
     setLogLevel("info")
     cleanup_containers()
-    os.system("sudo mn -c") 
     setup_docker_images()
     ryu_process = start_ryu_controller()
 
@@ -29,9 +28,21 @@ def start():
         net.start()
         info("[INFO] Network started...\n")
 
+        # Deploy "nginx" service called colab on all hosts
+        for host in net.hosts:
+            if host.name not in container_counter:
+                container_counter[host.name] = {}
+            if "colab" not in container_counter[host.name]:
+                container_counter[host.name]["colab"] = 0
+            while container_counter[host.name]["colab"] < 2:
+                container_counter[host.name]["colab"] += 1
+                colab_container_name = f"colab_{host.name}_{container_counter[host.name]['colab']}"
+                mgr.addContainer(colab_container_name, host.name, "nginx:alpine", "nginx", docker_args={})
+                print(f"[INFO] Colab service started on {host.name}")
+
         info("[INFO] Starting GUI...\n")
         root = tk.Tk()
-        deploy_gui = ServiceDeployGUI(root, mgr, net)
+        ServiceDeployGUI(root, mgr, net)
         info("[INFO] GUI started...\n")
         root.mainloop()
 
