@@ -7,9 +7,11 @@ class ServiceDeployGUI:
         self.root = root
         self.mgr = mgr
         self.net = net
+        
         # Example services names
         self.services = ["web", "random", "datetime"]  
         self.setup_gui()
+        
         # Automatically update communication results when GUI is opened
         self.update_communication_results() 
         

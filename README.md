@@ -9,7 +9,7 @@ containers_auto_deployment
 ├── src
 │   ├── main.py          # Entry point of the application
 │   ├── gui.py           # GUI for service deployment
-│   ├── network.py       # Network topology and controller
+│   ├── network.py       # Network topologies and controller
 │   └── services.py      # Service deployment and flow management
 ├── requirements.txt      # Project dependencies
 ├── Dockerfile            # Instructions for building the Docker image
@@ -38,18 +38,5 @@ containers_auto_deployment
 4. **Run the application:**
    Execute the main script:
    ```bash
-   python src/main.py
+   sudo python3 src/main.py
    ```
-
-## Usage Guidelines
-
-- Use the GUI to deploy services by selecting the service type and the host.
-- Manage active services and configure communication flows between them.
-- Monitor the network and service status through the GUI.
-
-## Overview of Functionality
-
-- **Service Deployment:** Deploy web servers and databases on specified hosts.
-- **Flow Management:** Configure and manage communication flows between deployed services.
-- **Network Topology:** Set up a virtual network topology using Mininet with Docker containers.
-
