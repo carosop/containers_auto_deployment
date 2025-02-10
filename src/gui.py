@@ -66,14 +66,14 @@ class ServiceDeployGUI:
         if not service_name:
             print("[ERROR] Service name is required.")
             return
-        control_services(self.mgr, self.net, action='deploy', service_name=service_name, gui=self)
+        control_services(self.mgr, action='deploy', service_name=service_name, gui=self)
 
     def stop_selected_service(self):
         selected_service = self.active_services_listbox.get(tk.ACTIVE)
         if not selected_service:
             print("[ERROR] No service selected.")
             return
-        control_services(self.mgr, self.net, action='stop', selected_process=selected_service, gui=self)
+        control_services(self.mgr, action='stop', selected_process=selected_service, gui=self)
     
     def update_communication_results(self):
         self.communication_results_text.delete(1.0, tk.END)

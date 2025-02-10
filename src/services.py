@@ -108,7 +108,7 @@ def cleanup_containers():
         print(f"[ERROR] Failed to cleanup containers: {e}")
 
 # services deploy and stop
-def deploy_service(mgr, service_name, net):
+def deploy_service(mgr, service_name):
     """
     Deploys a service, choosing hosts automatically.
     """
@@ -183,9 +183,9 @@ def deploy_service(mgr, service_name, net):
 
     # Call deploy_colab_service if needed after deploying the service
     if should_deploy_colab:
-        deploy_colab_service(mgr, net)
+        deploy_colab_service(mgr)
 
-def deploy_colab_service(mgr, net):
+def deploy_colab_service(mgr):
     """
     Deploys or redeploys colab services on available hosts dynamically.
     Colab services should use all available resources but give priority to user deployable services.
@@ -198,7 +198,7 @@ def deploy_colab_service(mgr, net):
         if len(available_hosts) < 1:
             print("[INFO] No available spaces to deploy colab services.")
             return
-        elif len(available_hosts) == 1 and len(mgr.getContainersDhost(available_hosts[0])) == 2:
+        elif len(available_hosts) == 1 and len(mgr.getContainersDhost(available_hosts[0])) == 0:
             # If only one host is available but has two free slots, deploy both services there.
             selected_hosts = [available_hosts[0], available_hosts[0]]
         elif len(available_hosts) >= 2:
@@ -396,7 +396,7 @@ def get_available_hosts(mgr):
 
 
 # manager of services interacting with gui
-def control_services(mgr, net, action, service_name=None, selected_process=None, gui=None):
+def control_services(mgr, action, service_name=None, selected_process=None, gui=None):
     """
     Controls the deployment, stopping, and redeployment of services based on GUI interactions.
     action: Action to perform ('deploy', 'stop','redeploy_colab')
@@ -404,17 +404,17 @@ def control_services(mgr, net, action, service_name=None, selected_process=None,
     global should_deploy_colab
 
     if action == 'deploy' and service_name:
-        deploy_service(mgr, service_name, net)
+        deploy_service(mgr, service_name)
     elif action == 'stop' and selected_process:
         stopped_services, removed_flows = stop_service(mgr, selected_process, service_instances)
         if should_deploy_colab:
-            deploy_colab_service(mgr, net)
+            deploy_colab_service(mgr)
         if gui:
             gui.update_active_services_listbox()
             gui.update_communication_results()
         return stopped_services, removed_flows
     elif action == 'redeploy_colab':
-        deploy_colab_service(mgr, net)
+        deploy_colab_service(mgr)
     else:
         print("[ERROR] Invalid action or missing parameters.")
         return [], []

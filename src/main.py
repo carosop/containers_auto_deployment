@@ -31,7 +31,7 @@ def start(topology_type):
         info("[INFO] Network started...\n")
 
         # Deploy "colab" service on all hosts
-        deploy_colab_service(mgr, net)
+        deploy_colab_service(mgr)
 
         info("[INFO] Starting GUI...\n")
         root = tk.Tk()
@@ -51,7 +51,6 @@ def start(topology_type):
             ryu_process.terminate()
 
 if __name__ == "__main__":
-    # Prompt the user to select the topology type
     print("Select the topology type:")
     print("1. Simple")
     print("2. Complex")
