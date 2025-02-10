@@ -1,16 +1,29 @@
-FROM python:3.9-slim
+# Use Ubuntu 20.04 as the base image
+FROM ubuntu:20.04
 
-# Set the working directory
-WORKDIR /app
+# Set non-interactive mode for apt-get
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Copy the requirements file
-COPY requirements.txt .
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    python3 python3-pip \
+    openvswitch-switch \
+    mininet \
+    curl \
+    iproute2 \
+    iputils-ping \
+    net-tools \
+    docker \
+    python3-tk \  
+    && rm -rf /var/lib/apt/lists/*
 
-# Install the required packages
-RUN pip install --no-cache-dir -r requirements.txt
+# Install Python dependencies
+RUN pip3 install --no-cache-dir \
+    ryu \
+    docker 
 
-# Copy the source code into the container
-COPY src/ ./src/
+# Expose necessary ports for services
+EXPOSE 6633 6653 8080 5000
 
-# Set the entry point for the application
-CMD ["python", "src/main.py"]
+# Default command to keep the container running
+CMD ["tail", "-f", "/dev/null"]

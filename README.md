@@ -32,7 +32,7 @@ containers_auto_deployment
 
 3. **Build the Docker image:**
    ```bash
-   docker build -t containers_auto_deployment .
+   docker build -t auto_deployment .
    ```
 
 4. **Run the application:**
