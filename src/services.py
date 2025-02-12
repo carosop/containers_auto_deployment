@@ -1,6 +1,7 @@
 import docker
 import random
-import subprocess
+import requests
+import os
 
 # Track flows between services
 flows = {}
@@ -16,56 +17,49 @@ service_counters = {
 }
 service_definitions = {
     "web": [
-        ("database", "python3 -c 'import os; os.makedirs(\"/shared\", exist_ok=True); "
-                     "subprocess.Popen([\"python3\", \"-m\", \"http.server\", \"81\"])'"),
-        ("webserver", "python3 -c 'import os, time, requests, http.server; "
-                      "class Handler(http.server.SimpleHTTPRequestHandler): "
-                      "    def do_GET(self): "
-                      "        try: "
-                      "            data = requests.get(\"http://localhost:81\").text; "
-                      "            self.send_response(200); "
-                      "            self.send_header(\"Content-type\", \"text/html\"); "
-                      "            self.end_headers(); "
-                      "            self.wfile.write(f\"<html><body><h1>Data from DB:</h1><p>{data}</p></body></html>\".encode()); "
-                      "        except Exception as e: "
-                      "            self.send_response(500); "
-                      "            self.end_headers(); "
-                      "            self.wfile.write(f\"<html><body><h1>Error:</h1><p>{e}</p></body></html>\".encode()); "
-                      "http.server.HTTPServer((\"\", 80), Handler).serve_forever()'")
+        ("database", 
+            "import os, subprocess, time; "
+            "subprocess.Popen(['python3', '-m', 'http.server', '81']); "
+            "exec('while True:\\n    time.sleep(3600)')"),  # Keeps the process alive
+        ("webserver", 
+            "import os; "
+            "os.system('python3 /shared/scripts/web_server.py')")  
     ],
     "random": [
-        ("random_gen1", "python3 -c 'import os, random; os.makedirs(\"/shared\", exist_ok=True); "
-                        "open(\"/shared/random_gen1.txt\", \"w\").write(str(random.randint(1, 100)))'"),
-        ("random_gen2", "python3 -c 'import os, random; os.makedirs(\"/shared\", exist_ok=True); "
-                        "open(\"/shared/random_gen2.txt\", \"w\").write(str(random.randint(1, 100)))'"),
-        ("random_sum", "python3 -c 'import os; os.makedirs(\"/shared\", exist_ok=True); "
-                       "open(\"/shared/random_gen1.txt\", \"a\").close(); "
-                       "open(\"/shared/random_gen2.txt\", \"a\").close(); "
-                       "a = int(open(\"/shared/random_gen1.txt\").read()); "
-                       "b = int(open(\"/shared/random_gen2.txt\").read()); "
-                       "open(\"/shared/random_result.txt\", \"w\").write(f\"{a} + {b} = {a+b}\")'"),
+        ("random_gen1", 
+            "import os; "
+            "os.system('python3 /shared/scripts/random_gen1.py')"),
+        ("random_gen2", 
+            "import os; "
+            "os.system('python3 /shared/scripts/random_gen2.py')"),
+        ("random_sum", 
+            "import os; "
+            "os.system('python3 /shared/scripts/random_sum.py')")
     ],
     "datetime": [
-        ("date_fetcher", "python3 -c 'import os, datetime; os.makedirs(\"/shared\", exist_ok=True); "
-                         "open(\"/shared/date.txt\", \"w\").write(str(datetime.datetime.now().date()))'"),
-        ("time_fetcher", "python3 -c 'import os, datetime; os.makedirs(\"/shared\", exist_ok=True); "
-                         "open(\"/shared/time.txt\", \"w\").write(str(datetime.datetime.now().time()))'"),
-        ("datetime_combiner", "python3 -c 'import os; os.makedirs(\"/shared\", exist_ok=True); "
-                              "date = open(\"/shared/date.txt\").read(); "
-                              "time = open(\"/shared/time.txt\").read(); "
-                              "open(\"/shared/datetime_result.txt\", \"w\").write(f\"{date} {time}\")'"),
+        ("date_fetcher", 
+            "import os; "
+            "os.system('python3 /shared/scripts/date_fetcher.py')"),
+        ("time_fetcher", 
+            "import os; "
+            "os.system('python3 /shared/scripts/time_fetcher.py')"),
+        ("datetime_combiner", 
+            "import os; "
+            "os.system('python3 /shared/scripts/datetime_combiner.py')")
     ],
     "colab": [
-        ("colab_a", "python3 -c 'import os, time; os.makedirs(\"/var/log\", exist_ok=True); "
-                    "log_file = \"/var/log/colab.log\"; "
-                    "while True: "
-                    "    open(log_file, \"a\").write(\"colab_a says hi!\\n\"); "
-                    "    time.sleep(1)'"),
-        ("colab_b", "python3 -c 'import os, time; os.makedirs(\"/var/log\", exist_ok=True); "
-                    "log_file = \"/var/log/colab.log\"; "
-                    "while True: "
-                    "    open(log_file, \"a\").write(\"colab_b replies hello!\\n\"); "
-                    "    time.sleep(1)'"),
+        ("colab_a", 
+            "import os; "
+            "os.makedirs('/shared', exist_ok=True); "
+            "service_key = os.getenv('SERVICE_KEY', 'unknown'); "
+            "log_file = f'/shared/{service_key}.log'; "
+            "open(log_file, 'a').write('colab_a says hi!\\n')"),
+        ("colab_b", 
+            "import os; "
+            "os.makedirs('/shared', exist_ok=True); "
+            "service_key = os.getenv('SERVICE_KEY', 'unknown'); "
+            "log_file = f'/shared/{service_key}.log'; "
+            "open(log_file, 'a').write('colab_b says hi too!\\n')")
     ]
 }
 
@@ -153,6 +147,8 @@ def deploy_service(mgr, service_name):
         "flows": []
     }
 
+    scripts_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'scripts'))
+    
     for (app_name, command), host in zip(service_definitions[service_name], selected_hosts):
         if len(mgr.getContainersDhost(host)) == 2:
             print(f"[ERROR] Host {host} already has 2 containers.")
@@ -164,10 +160,19 @@ def deploy_service(mgr, service_name):
         container_counter[host][app_name] += 1
         container_name = f"{app_name}_{host}_{container_counter[host][app_name]}"
         try:
-            process_cmd = ["python3", "-c", command]
-            mgr.addContainer(container_name, host, "python:3.8-slim", process_cmd, docker_args={
+            process_cmd = ["python3", "-c", command.replace('localhost', mgr.net.get(host).IP())]
+            env_vars = {
+                "SERVICE_KEY": service_key,
+                "HOSTNAME": mgr.net.get(host).IP(),
+                "NAME": container_name
+            }
+            mgr.addContainer(container_name, host, "auto_deployment", process_cmd, docker_args={
                 "command": process_cmd, 
-                "volumes": {"/shared": {"bind": "/shared", "mode": "rw"}}
+                "volumes": {
+                    "/shared": {"bind": "/shared", "mode": "rw"},
+                    scripts_path : {"bind": "/shared/scripts", "mode": "ro"} 
+                },
+                "environment": env_vars
             })
             service_instances[service_key]["processes"].append(container_name)
             print(f"[INFO] Service {app_name} started on {host}")
@@ -216,6 +221,7 @@ def deploy_colab_service(mgr):
             "flows": []
         }
 
+        scripts_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'scripts'))
         for (app_name, command), host in zip(service_definitions["colab"], selected_hosts):
             if len(mgr.getContainersDhost(host)) == 2:
                 print(f"[INFO] Skipping {host}, already has 2 containers.")
@@ -226,14 +232,17 @@ def deploy_colab_service(mgr):
             if app_name not in container_counter[host]:
                 container_counter[host][app_name] = 0
             container_counter[host][app_name] += 1
-
             container_name = f"{app_name}_{host}_{container_counter[host][app_name]}"
 
             try:
-                process_cmd = ["python3", "-c", command]
+                process_cmd = ["python3", "-c", command.replace('localhost', container_name)]
                 mgr.addContainer(container_name, host, "auto_deployment", process_cmd, docker_args={
                     "command": process_cmd, 
-                    "volumes": {"/shared": {"bind": "/shared", "mode": "rw"}}
+                    "volumes": {
+                        "/shared": {"bind": "/shared", "mode": "rw"},
+                        scripts_path : {"bind": "/shared/scripts", "mode": "ro"} 
+                    },
+                    "environment": {"SERVICE_KEY": service_key}
                 })
                 service_instances[service_key]["processes"].append(container_name)
                 print(f"[INFO] Colab service {app_name} started on {host}")
@@ -334,10 +343,13 @@ def setup_flow(switch, src_ip, dst_ip, in_port, out_port):
     """
     Set up SDN flows.
     """
-    flow_rule = f"priority=100,ip,nw_src={src_ip},nw_dst={dst_ip},actions=output:{out_port}"
-    switch.dpctl('add-flow', flow_rule)
-    flows[(src_ip, dst_ip)] = (switch, in_port, out_port)
-    print(f"[INFO] Flow added: {src_ip} -> {dst_ip}")
+    try:
+        flow_rule = f"priority=100,ip,nw_src={src_ip},nw_dst={dst_ip},actions=output:{out_port}"
+        switch.dpctl('add-flow', flow_rule)
+        flows[(src_ip, dst_ip)] = (switch, in_port, out_port)
+        print(f"[INFO] Flow added: {src_ip} -> {dst_ip}")
+    except Exception as e:
+        print(f"[ERROR] Failed to add flow: {src_ip} -> {dst_ip}. Error: {e}")
 
 def remove_flow(switch, src_ip, dst_ip):
     """
@@ -424,38 +436,88 @@ def control_services(mgr, action, service_name=None, selected_process=None, gui=
         gui.update_communication_results()
 
 
-# test services 
-def test_services(mgr, net, gui):
+# test services
+def test_services(mgr):
     """
-    Tests the deployed services and updates the GUI with the results.
+    Tests the deployed services by checking their functionality and summarizing the results for each service.
     """
-    test_results = []
+    test_results = {}
 
     for service_key, service_info in service_instances.items():
         service_name = service_key.split('_')[0]
 
-        for process in service_info["processes"]:
-            try:
-                host_name = process.split('_')[2]  # Extract the host name
-                host = net.get(host_name)
+        try:
+            if service_name == "colab":
+                log_file_path = f"/shared/{service_key}.log"
+                with open(log_file_path, "r") as f:
+                    result = f.read().strip()
+                if not result:
+                    result = "Colab log file is empty or not written correctly."
+                test_results[service_key] = result.strip()
 
-                if service_name == "colab":
-                    result = host.cmd("tail -n 5 /var/log/colab.log")  
-                elif service_name == "web":
-                    result = host.cmd("curl -s -o /dev/null -w '%{http_code}' http://localhost:80")  
-                elif service_name == "random":
-                    result = host.cmd("cat /shared/random_result.txt")
-                elif service_name == "datetime":
-                    result = host.cmd("cat /shared/datetime_result.txt")
-                else:
-                    result = "Unknown service type"
+            elif service_name == "web":
+                # Send a request to the web server to verify it is running
+                web_server_process = next((p for p in service_info["processes"] if "webserver" in p), None)
+                if web_server_process:
+                    host = web_server_process.split('_')[1]
+                    ip = mgr.net.get(host).IP()
+                    url = f"http://{ip}:8081"
+                try:
+                    response = requests.get(url)
+                    if response.status_code == 200:
+                        # If successful, get the first 100 characters from the body
+                        result = f"Web service is running. Response: {response.text[:100]}"
+                    else:
+                        result = f"Error: Web service returned status code {response.status_code}"
+                except requests.ConnectionError as e:
+                    result = f"Error: Failed to connect to web service. {e}"
+                test_results[service_key] = result.strip()
 
-                test_results.append(f"Service: {service_key}, Process: {process}, Result: {result.strip()}")
-                print(f"Service: {service_key}, Process: {process}, Result: {result.strip()}")
+            elif service_name == "random":
+                result_file_path = f"/shared/{service_key}.txt"
+                with open(result_file_path, "r") as f:
+                    result = f.read().strip()
+                if not result:
+                    result = "Random result file is empty or not written correctly."
+                test_results[service_key] = result.strip()
 
-            except Exception as e:
-                test_results.append(f"Service: {service_key}, Process: {process}, Error: {e}")
-                print(f"[ERROR] Service: {service_key}, Process: {process}, Error: {e}")
+            elif service_name == "datetime":
+                result_file_path = f"/shared/{service_key}.txt"
+                with open(result_file_path, "r") as f:
+                    result = f.read().strip()
+                if not result:
+                    result = "Datetime result file is empty or not written correctly."
+                test_results[service_key] = result.strip()
+
+            else:
+                test_results[service_key] = "Unknown service type"
+
+        except FileNotFoundError:
+            test_results[service_key] = f"{service_name} result file not found."
+        except Exception as e:
+            test_results[service_key] = f"Error reading {service_name} result file: {e}"
+
+    # Print the summarized results
+    print("\n--- Test Results Summary ---\n")
+    for service_key, result in test_results.items():
+        print(f"Service: {service_key}")
+        print(f"  - Result: {result}")
+        print("\n" + "-"*30 + "\n")
 
     return test_results
 
+def clean_shared_folder():
+    """
+    Clean up the /shared folder by deleting all files except the scripts directory.
+    """
+    shared_folder = "/shared"
+    if os.path.exists(shared_folder):
+        for filename in os.listdir(shared_folder):
+            file_path = os.path.join(shared_folder, filename)
+            try:
+                if os.path.isfile(file_path) or os.path.islink(file_path):
+                    os.unlink(file_path)
+                elif os.path.isdir(file_path) and filename != "scripts":
+                    os.rmdir(file_path)
+            except Exception as e:
+                print(f"[ERROR] Failed to delete {file_path}. Reason: {e}")

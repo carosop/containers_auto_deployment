@@ -7,13 +7,21 @@ This project provides a graphical user interface (GUI) for deploying and managin
 ```
 containers_auto_deployment
 ├── src
-│   ├── main.py          # Entry point of the application
-│   ├── gui.py           # GUI for service deployment
-│   ├── network.py       # Network topologies and controller
-│   └── services.py      # Service deployment and flow management
-├── requirements.txt      # Project dependencies
-├── Dockerfile            # Instructions for building the Docker image
-└── README.md             # Project documentation
+│   ├── scripts
+│   │   ├── web_server.py
+│   │   ├── random_gen1.py
+│   │   ├── random_gen2.py
+│   │   ├── random_sum.py
+│   │   ├── date_fetcher.py
+│   │   ├── time_fetcher.py
+│   │   └── datetime_combiner.py
+│   ├── main.py
+│   ├── gui.py
+│   ├── network.py
+│   └── services.py
+├── requirements.txt
+├── Dockerfile
+└── README.md
 ```
 
 ## Setup Instructions

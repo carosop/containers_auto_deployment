@@ -83,9 +83,9 @@ class ServiceDeployGUI:
             
     def update_test_results(self, test_results):
         self.test_results_text.delete(1.0, tk.END)
-        for result in test_results:
-            self.test_results_text.insert(tk.END, f"{result}\n")
+        for service_key, result in test_results.items():
+            self.test_results_text.insert(tk.END, f"Service: {service_key}\n  - Result: {result}\n\n{'-'*30}\n")
 
     def test_services_callback(self):
-        test_results = test_services(self.mgr, self.net, self)
+        test_results = test_services(self.mgr)
         self.update_test_results(test_results)

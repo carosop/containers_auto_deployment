@@ -7,7 +7,7 @@ from mininet.log import setLogLevel, info
 from mininet.link import TCLink
 from gui import ServiceDeployGUI
 from network import build_topology, start_ryu_controller
-from services import deploy_colab_service, setup_docker_images, cleanup_containers
+from services import deploy_colab_service, setup_docker_images, cleanup_containers, clean_shared_folder
 
 def start(topology_type):
     setLogLevel("info")
@@ -39,12 +39,17 @@ def start(topology_type):
         info("[INFO] GUI started...\n")
         root.mainloop()
 
+    except Exception as e:
+        print(f"[ERROR] An error occurred: {e}")
     finally:
         print("[INFO] Stopping the network...")
         net.stop()
         print("[INFO] Stopping the manager...")
         mgr.stop()
         os.system("sudo mn -c")
+
+        print("[INFO] Cleaning up the /shared folder...")
+        clean_shared_folder()
 
         print("[INFO] Stopping the Ryu controller...")
         if ryu_process:
