@@ -29,7 +29,7 @@ containers_auto_deployment
 
 ## Setup Instructions
 
-1. **Install Comnetsemu (preferably using Vagrant)**:
+1. **Install Comnetsemu (preferably using Vagrant)**:<br />
    This project is designed to work within the Comnetsemu environment.<br />
       You can find the installation instructions here:<br />
       https://git.comnets.net/public-repo/comnetsemu#installation
