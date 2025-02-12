@@ -1,7 +1,7 @@
 # Containers auto deployment
 
-This project automates the deployment and management of Docker services on an SDN network using Mininet and a Ryu controller. 
-It supports two network topologies: a simple topology with four switches and six Docker hosts, and a complex topology with six switches and eight Docker hosts. 
+This project automates the deployment and management of Docker services on an SDN network using Mininet and a Ryu controller. <br />
+It supports two network topologies: a simple topology with four switches and six Docker hosts, and a complex topology with six switches and eight Docker hosts. <br />
 The project includes a GUI for deploying, stopping and testing services, and automatically configures SDN flows for communication between services.
 
 ## Project Structure
@@ -29,12 +29,12 @@ containers_auto_deployment
 
 ## Setup Instructions
 
-1. **Install Comnetsemu (preferably using Vagrant)** 
-   This project is designed to work within the Comnetsemu environment.
-      You can find the installation instructions here:
+1. **Install Comnetsemu (preferably using Vagrant)**:
+   This project is designed to work within the Comnetsemu environment.<br />
+      You can find the installation instructions here:<br />
       https://git.comnets.net/public-repo/comnetsemu#installation
 
-      For additional information, refer to:
+      For additional information, refer to:<br />
       https://www.granelli-lab.org/researches/relevant-projects/comnetsemu-labs
 
 2. **Clone the repository:**
@@ -43,8 +43,8 @@ containers_auto_deployment
    cd containers_auto_deployment
    ```
 
-3. **Check the Comnetsemu version**
-   This project was developed on Ubuntu 20.04 with Comnetsemu (ubuntu-20.04-comnetsemu). 
+3. **Check the Comnetsemu version**: <br />
+   This project was developed on Ubuntu 20.04 with Comnetsemu (ubuntu-20.04-comnetsemu). <br />
    Ensure that the Ryu controller is located at:
       ```bash
       /usr/lib/python3/dist-packages/ryu/app/simple_switch_stp_13.py
