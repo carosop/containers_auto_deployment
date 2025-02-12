@@ -2,7 +2,7 @@ import http.server
 import socketserver
 import os
 
-PORT = 8082
+PORT = 81
 host = os.getenv('HOSTNAME', '0.0.0.0')
 
 # Fake database
@@ -25,5 +25,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
 if __name__ == "__main__":
     with socketserver.TCPServer((host, PORT), Handler) as httpd:
-        print(f"Serving on port {PORT}")
+        print(f"Serving on port {PORT}, host {host}")
+        print("Database server is running and listening on the correct port")
         httpd.serve_forever()

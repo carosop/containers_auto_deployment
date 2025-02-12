@@ -2,7 +2,6 @@ import docker
 import random
 import requests
 import os
-import time
 
 # Track flows between services
 flows = {}
@@ -160,9 +159,12 @@ def deploy_service(mgr, service_name):
         container_counter[host][app_name] += 1
         container_name = f"{app_name}_{host}_{container_counter[host][app_name]}"
         try:
-            if app_name == "webserver":
-                database_host = next((p.split('_')[1] for p in service_instances[service_key]["processes"] if "database" in p), 'localhost')
-                process_cmd = ["python3", "/shared/scripts/web_server.py", mgr.net.get(database_host).IP()]
+            if app_name == "database":
+                db_ip = mgr.net.get(host).IP()
+                print(f"[INFO] Database IP: {db_ip}")
+                process_cmd = ["python3", "/shared/scripts/database.py"]
+            elif app_name == "webserver":
+                process_cmd = ["python3", "/shared/scripts/web_server.py", f"http://{db_ip}:81"]
             else:
                 process_cmd = ["python3", "-c", command.replace('localhost', mgr.net.get(host).IP())]
             env_vars = {
@@ -460,28 +462,34 @@ def test_services(mgr):
                 test_results[service_key] = result.strip()
 
             elif service_name == "web":
-                # Send a request to the web server to verify it is running
                 web_server_process = next((p for p in service_info["processes"] if "webserver" in p), None)
-                database_process = next((p for p in service_info["processes"] if "database" in p), None)
-                if web_server_process and database_process:
-                    host = web_server_process.split('_')[1]
-                    database_host = database_process.split('_')[1]
-                    ip = mgr.net.get(host).IP()
-                    database_ip = mgr.net.get(database_host).IP()
-                    url = f"http://{ip}:8081/1" 
-                    time.sleep(20)  # Increase the sleep time to allow the web server to start
+                db_server_process = next((p for p in service_info["processes"] if "database" in p), None)
+
+                if web_server_process and db_server_process:
+                    web_host = web_server_process.split('_')[1]
+                    db_host = db_server_process.split('_')[1]
+
+                    web_ip = mgr.net.get(web_host).IP()
+                    print(web_ip)
+                    db_ip = mgr.net.get(db_host).IP()
+                    print(db_ip)
+                    web_url = f"http://{web_ip}:80"
+                    db_url = f"http://{db_ip}:81/1"  # Test fetching item 1
+
                     try:
-                        response = requests.get(url, timeout=20)  # Increase the request timeout
-                        if response.status_code == 200:
-                            # If successful, get the first 100 characters from the body
-                            result = f"Web service is running. Response: {response.text[:100]}"
+                        web_response = requests.get(web_url)
+                        db_response = requests.get(db_url)
+
+                        if web_response.status_code == 200 and db_response.status_code == 200:
+                            result = f"Web service running. DB Response: {db_response.text[:100]}"
                         else:
-                            result = f"Error: Web service returned status code {response.status_code}"
+                            result = f"Web or DB service failed. Web: {web_response.status_code}, DB: {db_response.status_code}"
                     except requests.ConnectionError as e:
-                        result = f"Error: Failed to connect to web service. {e}"
-                    test_results[service_key] = result.strip()
+                        result = f"Error: Could not connect to one of the services. {e}"
                 else:
-                    test_results[service_key] = "Web server or database process not found."
+                    result = "Web or Database service is missing"
+
+                test_results[service_key] = result.strip()
             elif service_name == "random":
                 result_file_path = f"/shared/{service_key}.txt"
                 with open(result_file_path, "r") as f:
