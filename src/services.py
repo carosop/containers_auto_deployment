@@ -2,6 +2,7 @@ import docker
 import random
 import requests
 import os
+import time
 
 # Track flows between services
 flows = {}
@@ -18,9 +19,8 @@ service_counters = {
 service_definitions = {
     "web": [
         ("database", 
-            "import os, subprocess, time; "
-            "subprocess.Popen(['python3', '-m', 'http.server', '81']); "
-            "exec('while True:\\n    time.sleep(3600)')"),  # Keeps the process alive
+            "import os; "
+            "os.system('python3 /shared/scripts/database.py')"),
         ("webserver", 
             "import os; "
             "os.system('python3 /shared/scripts/web_server.py')")  
@@ -160,7 +160,11 @@ def deploy_service(mgr, service_name):
         container_counter[host][app_name] += 1
         container_name = f"{app_name}_{host}_{container_counter[host][app_name]}"
         try:
-            process_cmd = ["python3", "-c", command.replace('localhost', mgr.net.get(host).IP())]
+            if app_name == "webserver":
+                database_host = next((p.split('_')[1] for p in service_instances[service_key]["processes"] if "database" in p), 'localhost')
+                process_cmd = ["python3", "/shared/scripts/web_server.py", mgr.net.get(database_host).IP()]
+            else:
+                process_cmd = ["python3", "-c", command.replace('localhost', mgr.net.get(host).IP())]
             env_vars = {
                 "SERVICE_KEY": service_key,
                 "HOSTNAME": mgr.net.get(host).IP(),
@@ -458,21 +462,26 @@ def test_services(mgr):
             elif service_name == "web":
                 # Send a request to the web server to verify it is running
                 web_server_process = next((p for p in service_info["processes"] if "webserver" in p), None)
-                if web_server_process:
+                database_process = next((p for p in service_info["processes"] if "database" in p), None)
+                if web_server_process and database_process:
                     host = web_server_process.split('_')[1]
+                    database_host = database_process.split('_')[1]
                     ip = mgr.net.get(host).IP()
-                    url = f"http://{ip}:8081"
-                try:
-                    response = requests.get(url)
-                    if response.status_code == 200:
-                        # If successful, get the first 100 characters from the body
-                        result = f"Web service is running. Response: {response.text[:100]}"
-                    else:
-                        result = f"Error: Web service returned status code {response.status_code}"
-                except requests.ConnectionError as e:
-                    result = f"Error: Failed to connect to web service. {e}"
-                test_results[service_key] = result.strip()
-
+                    database_ip = mgr.net.get(database_host).IP()
+                    url = f"http://{ip}:8081/1" 
+                    time.sleep(20)  # Increase the sleep time to allow the web server to start
+                    try:
+                        response = requests.get(url, timeout=20)  # Increase the request timeout
+                        if response.status_code == 200:
+                            # If successful, get the first 100 characters from the body
+                            result = f"Web service is running. Response: {response.text[:100]}"
+                        else:
+                            result = f"Error: Web service returned status code {response.status_code}"
+                    except requests.ConnectionError as e:
+                        result = f"Error: Failed to connect to web service. {e}"
+                    test_results[service_key] = result.strip()
+                else:
+                    test_results[service_key] = "Web server or database process not found."
             elif service_name == "random":
                 result_file_path = f"/shared/{service_key}.txt"
                 with open(result_file_path, "r") as f:

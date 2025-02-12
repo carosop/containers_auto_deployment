@@ -99,10 +99,11 @@ def start_ryu_controller():
     """
     Start the Ryu controller.
     """
+    path = "/usr/lib/python3/dist-packages/ryu/app/simple_switch_stp_13.py"
     try:
         print("[INFO] Starting Ryu controller...")
         process = subprocess.Popen(
-            ["ryu-manager", "/usr/lib/python3/dist-packages/ryu/app/simple_switch_stp_13.py"],
+            ["ryu-manager", path],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,

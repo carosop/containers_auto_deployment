@@ -21,7 +21,7 @@ RUN apt-get update && apt-get install -y \
 RUN pip3 install --no-cache-dir \
     ryu \
     docker \
-    flask \
+    #flask \
     requests
 
 # Copy the scripts directory into the container
