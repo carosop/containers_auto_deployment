@@ -1,6 +1,8 @@
 import docker
 import random
 import requests
+import subprocess
+import json
 import os
 
 # Track flows between services
@@ -160,7 +162,8 @@ def deploy_service(mgr, service_name):
         container_name = f"{app_name}_{host}_{container_counter[host][app_name]}"
         try:
             if app_name == "database":
-                db_ip = mgr.net.get(host).IP()
+                # db_ip = mgr.net.get(host).IP()
+                db_ip = container_name
                 print(f"[INFO] Database IP: {db_ip}")
                 process_cmd = ["python3", "/shared/scripts/database.py"]
             elif app_name == "webserver":
@@ -169,7 +172,7 @@ def deploy_service(mgr, service_name):
                 process_cmd = ["python3", "-c", command.replace('localhost', mgr.net.get(host).IP())]
             env_vars = {
                 "SERVICE_KEY": service_key,
-                "HOSTNAME": mgr.net.get(host).IP(),
+                "HOSTNAME": "0.0.0.0", # mgr.net.get(host).IP(),
                 "NAME": container_name
             }
             mgr.addContainer(container_name, host, "auto_deployment", process_cmd, docker_args={
@@ -178,7 +181,8 @@ def deploy_service(mgr, service_name):
                     "/shared": {"bind": "/shared", "mode": "rw"},
                     scripts_path : {"bind": "/shared/scripts", "mode": "ro"} 
                 },
-                "environment": env_vars
+                "environment": env_vars,
+                "network": "bridge",
             })
             service_instances[service_key]["processes"].append(container_name)
             print(f"[INFO] Service {app_name} started on {host}")
@@ -248,7 +252,8 @@ def deploy_colab_service(mgr):
                         "/shared": {"bind": "/shared", "mode": "rw"},
                         scripts_path : {"bind": "/shared/scripts", "mode": "ro"} 
                     },
-                    "environment": {"SERVICE_KEY": service_key}
+                    "environment": {"SERVICE_KEY": service_key},
+                    "network": "bridge",
                 })
                 service_instances[service_key]["processes"].append(container_name)
                 print(f"[INFO] Colab service {app_name} started on {host}")
@@ -464,21 +469,20 @@ def test_services(mgr):
             elif service_name == "web":
                 web_server_process = next((p for p in service_info["processes"] if "webserver" in p), None)
                 db_server_process = next((p for p in service_info["processes"] if "database" in p), None)
-
+                
                 if web_server_process and db_server_process:
-                    web_host = web_server_process.split('_')[1]
-                    db_host = db_server_process.split('_')[1]
-
-                    web_ip = mgr.net.get(web_host).IP()
-                    print(web_ip)
-                    db_ip = mgr.net.get(db_host).IP()
-                    print(db_ip)
+                    web_ip = get_container_ip(web_server_process)
+                    db_ip = get_container_ip(db_server_process)
+                    n = random.randint(1, 3)
                     web_url = f"http://{web_ip}:80"
-                    db_url = f"http://{db_ip}:81/1"  # Test fetching item 1
+                    db_url = f"http://{db_ip}:81/{n}"  
+
+                    print(f"[DEBUG] Expected web_url: {web_url}")
+                    print(f"[DEBUG] Expected db_url: {db_url}")
 
                     try:
-                        web_response = requests.get(web_url)
-                        db_response = requests.get(db_url)
+                        web_response = requests.get(web_url, timeout=10)
+                        db_response = requests.get(db_url, timeout=10)
 
                         if web_response.status_code == 200 and db_response.status_code == 200:
                             result = f"Web service running. DB Response: {db_response.text[:100]}"
@@ -486,9 +490,10 @@ def test_services(mgr):
                             result = f"Web or DB service failed. Web: {web_response.status_code}, DB: {db_response.status_code}"
                     except requests.ConnectionError as e:
                         result = f"Error: Could not connect to one of the services. {e}"
+                    except requests.Timeout:
+                        result = "Error: Request to one of the services timed out."
                 else:
                     result = "Web or Database service is missing"
-
                 test_results[service_key] = result.strip()
             elif service_name == "random":
                 result_file_path = f"/shared/{service_key}.txt"
@@ -522,6 +527,26 @@ def test_services(mgr):
         print("\n" + "-"*30 + "\n")
 
     return test_results
+
+def get_container_ip(container_name):
+    # Run the docker network inspect command to get the details in JSON format
+    result = subprocess.run(
+        ['docker', 'network', 'inspect', 'bridge'],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+
+    # Parse the JSON response
+    network_info = json.loads(result.stdout)
+
+    # Find the container info by matching the container name
+    for container in network_info[0]['Containers']:
+        if container_name in network_info[0]['Containers'][container]['Name']:
+            # Return the IP address of the container
+            return network_info[0]['Containers'][container]['IPv4Address'].split('/')[0]
+
+    # Return None if not found
+    return None
 
 def clean_shared_folder():
     """
