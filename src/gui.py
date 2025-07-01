@@ -25,14 +25,16 @@ class ServiceDeployGUI:
             self.test_service_combobox.set(active_service_keys[0])
     def setup_gui(self):
         self.root.title("SDN Service Deployment & Monitoring")
-        self.root.grid_rowconfigure(0, weight=1)
-        self.root.grid_rowconfigure(1, weight=1)
-        self.root.grid_columnconfigure(0, weight=1)
-        self.root.grid_columnconfigure(1, weight=1)
+        self.root.minsize(1200, 800)  
+        for i in range(2):
+            self.root.grid_rowconfigure(i, weight=1)
+            self.root.grid_columnconfigure(i, weight=1)
 
         # Service Deployment
         deploy_frame = ttk.LabelFrame(self.root, text="Service Deployment")
         deploy_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+        deploy_frame.grid_rowconfigure(0, weight=1)
+        deploy_frame.grid_columnconfigure(1, weight=1)
         ttk.Label(deploy_frame, text="Service Type:").grid(row=0, column=0, padx=5, pady=5, sticky="w")
         self.service_combobox = ttk.Combobox(deploy_frame, values=self.services, state="readonly")
         self.service_combobox.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
@@ -42,6 +44,8 @@ class ServiceDeployGUI:
         # Active Services
         active_frame = ttk.LabelFrame(self.root, text="Active Services")
         active_frame.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
+        active_frame.grid_rowconfigure(0, weight=1)
+        active_frame.grid_columnconfigure(0, weight=1)
         self.active_services_listbox = tk.Listbox(active_frame, height=10, width=40)
         self.active_services_listbox.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
         ttk.Button(active_frame, text="Stop Selected", command=self.stop_selected_service).grid(row=1, column=0, pady=5)
@@ -50,6 +54,8 @@ class ServiceDeployGUI:
         # Communication Flows
         flow_frame = ttk.LabelFrame(self.root, text="SDN Communication Flows")
         flow_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
+        flow_frame.grid_rowconfigure(0, weight=1)
+        flow_frame.grid_columnconfigure(0, weight=1)
         self.communication_results_text = tk.Text(flow_frame, height=15, width=60, state="disabled")
         self.communication_results_text.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
         ttk.Button(flow_frame, text="Refresh Flows", command=self.update_communication_results).grid(row=1, column=0, pady=5)
@@ -57,6 +63,8 @@ class ServiceDeployGUI:
         # Test Results
         test_frame = ttk.LabelFrame(self.root, text="Service Test Results")
         test_frame.grid(row=1, column=1, padx=10, pady=10, sticky="nsew")
+        flow_frame.grid_rowconfigure(0, weight=1)
+        flow_frame.grid_columnconfigure(0, weight=1)
         ttk.Label(test_frame, text="Service to Test:").grid(row=0, column=0, padx=5, pady=5, sticky="w")
         self.test_service_combobox = ttk.Combobox(test_frame, values=self.services, state="readonly")
         self.test_service_combobox.grid(row=0, column=1, padx=5, pady=5, sticky="ew")

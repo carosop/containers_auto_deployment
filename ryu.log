@@ -70,6 +70,527 @@ BRICK ofp_event
   CONSUMES EventOFPPortDescStatsReply
   CONSUMES EventOFPPortStatus
   CONSUMES EventOFPSwitchFeatures
-(12832) wsgi starting up on http://0.0.0.0:8080
-(12832) accepted ('127.0.0.1', 40480)
-127.0.0.1 - - [30/Jun/2025 17:55:27] "GET /stats/switches HTTP/1.1" 200 109 0.012180
+(6065) wsgi starting up on http://0.0.0.0:8080
+(6065) accepted ('127.0.0.1', 34816)
+127.0.0.1 - - [01/Jul/2025 13:28:23] "GET /stats/switches HTTP/1.1" 200 109 0.026050
+connected socket:<eventlet.greenio.base.GreenSocket object at 0x7f8fcc682130> address:('127.0.0.1', 36148)
+EVENT ofp_event->dpset EventOFPStateChange
+connected socket:<eventlet.greenio.base.GreenSocket object at 0x7f8fcc5dceb0> address:('127.0.0.1', 36164)
+hello ev <ryu.controller.ofp_event.EventOFPHello object at 0x7f8fcc6a5f70>
+move onto config mode
+EVENT ofp_event->dpset EventOFPSwitchFeatures
+EVENT ofp_event->Controller EventOFPSwitchFeatures
+switch features ev version=0x4,msg_type=0x6,msg_len=0x20,xid=0x30507386,OFPSwitchFeatures(auxiliary_id=0,capabilities=79,datapath_id=1,n_buffers=0,n_tables=254)
+move onto main mode
+EVENT ofp_event->dpset EventOFPStateChange
+DPSET: register datapath <ryu.controller.controller.Datapath object at 0x7f8fcc5dcf10>
+connected socket:<eventlet.greenio.base.GreenSocket object at 0x7f8fcc68df10> address:('127.0.0.1', 36166)
+hello ev <ryu.controller.ofp_event.EventOFPHello object at 0x7f8fcc5ed880>
+move onto config mode
+EVENT ofp_event->dpset EventOFPSwitchFeatures
+EVENT ofp_event->Controller EventOFPSwitchFeatures
+switch features ev version=0x4,msg_type=0x6,msg_len=0x20,xid=0xdc70239a,OFPSwitchFeatures(auxiliary_id=0,capabilities=79,datapath_id=2,n_buffers=0,n_tables=254)
+move onto main mode
+EVENT ofp_event->dpset EventOFPStateChange
+DPSET: register datapath <ryu.controller.controller.Datapath object at 0x7f8fcc68de20>
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+connected socket:<eventlet.greenio.base.GreenSocket object at 0x7f8fcc5ed7c0> address:('127.0.0.1', 36182)
+EVENT ofp_event->Controller EventOFPPacketIn
+hello ev <ryu.controller.ofp_event.EventOFPHello object at 0x7f8fcc88d1f0>
+move onto config mode
+EVENT ofp_event->dpset EventOFPSwitchFeatures
+EVENT ofp_event->Controller EventOFPSwitchFeatures
+switch features ev version=0x4,msg_type=0x6,msg_len=0x20,xid=0xac064b17,OFPSwitchFeatures(auxiliary_id=0,capabilities=79,datapath_id=3,n_buffers=0,n_tables=254)
+move onto main mode
+EVENT ofp_event->dpset EventOFPStateChange
+DPSET: register datapath <ryu.controller.controller.Datapath object at 0x7f8fcc5ed3a0>
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+connected socket:<eventlet.greenio.base.GreenSocket object at 0x7f8fcdf6e2e0> address:('127.0.0.1', 36198)
+hello ev <ryu.controller.ofp_event.EventOFPHello object at 0x7f8fcc5aa5e0>
+move onto config mode
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->dpset EventOFPSwitchFeatures
+EVENT ofp_event->Controller EventOFPSwitchFeatures
+switch features ev version=0x4,msg_type=0x6,msg_len=0x20,xid=0x4ed6cf24,OFPSwitchFeatures(auxiliary_id=0,capabilities=79,datapath_id=4,n_buffers=0,n_tables=254)
+EVENT ofp_event->Controller EventOFPPacketIn
+move onto main mode
+EVENT ofp_event->dpset EventOFPStateChange
+DPSET: register datapath <ryu.controller.controller.Datapath object at 0x7f8fcc6a5880>
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+(6065) accepted ('127.0.0.1', 52906)
+Sending message with xid(ac064b1b) to datapath(0000000000000003): version=None,msg_type=None,msg_len=None,xid=0xac064b1b,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=2,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 1, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.3', 'ipv4_dst': '10.0.0.5'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:28:59] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.005002
+(6065) accepted ('127.0.0.1', 52908)
+Sending message with xid(ac064b1c) to datapath(0000000000000003): version=None,msg_type=None,msg_len=None,xid=0xac064b1c,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=1,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 2, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.5', 'ipv4_dst': '10.0.0.3'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:28:59] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.003294
+(6065) accepted ('127.0.0.1', 52922)
+Sending message with xid(dc70239e) to datapath(0000000000000002): version=None,msg_type=None,msg_len=None,xid=0xdc70239e,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=3,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 4, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.3', 'ipv4_dst': '10.0.0.5'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:28:59] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.004245
+(6065) accepted ('127.0.0.1', 52924)
+Sending message with xid(dc70239f) to datapath(0000000000000002): version=None,msg_type=None,msg_len=None,xid=0xdc70239f,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=4,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 3, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.5', 'ipv4_dst': '10.0.0.3'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:28:59] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.017227
+(6065) accepted ('127.0.0.1', 52930)
+Sending message with xid(3050738a) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x3050738a,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=2,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 3, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.3', 'ipv4_dst': '10.0.0.5'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:28:59] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.008822
+(6065) accepted ('127.0.0.1', 52942)
+Sending message with xid(3050738b) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x3050738b,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=3,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 2, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.5', 'ipv4_dst': '10.0.0.3'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:28:59] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.006995
+(6065) accepted ('127.0.0.1', 52944)
+Sending message with xid(ac064b1d) to datapath(0000000000000003): version=None,msg_type=None,msg_len=None,xid=0xac064b1d,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=2,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 1, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.3', 'ipv4_dst': '10.0.0.5', 'tcp_dst': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:28:59] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.007850
+(6065) accepted ('127.0.0.1', 52950)
+Sending message with xid(ac064b1e) to datapath(0000000000000003): version=None,msg_type=None,msg_len=None,xid=0xac064b1e,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=1,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 2, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.5', 'ipv4_dst': '10.0.0.3', 'tcp_src': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:28:59] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.007987
+(6065) accepted ('127.0.0.1', 52952)
+Sending message with xid(dc7023a0) to datapath(0000000000000002): version=None,msg_type=None,msg_len=None,xid=0xdc7023a0,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=3,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 4, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.3', 'ipv4_dst': '10.0.0.5', 'tcp_dst': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:28:59] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.008683
+(6065) accepted ('127.0.0.1', 52960)
+Sending message with xid(dc7023a1) to datapath(0000000000000002): version=None,msg_type=None,msg_len=None,xid=0xdc7023a1,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=4,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 3, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.5', 'ipv4_dst': '10.0.0.3', 'tcp_src': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:28:59] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.002484
+(6065) accepted ('127.0.0.1', 56622)
+Sending message with xid(3050738c) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x3050738c,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=2,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 3, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.3', 'ipv4_dst': '10.0.0.5', 'tcp_dst': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:28:59] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.002827
+(6065) accepted ('127.0.0.1', 56630)
+Sending message with xid(3050738d) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x3050738d,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=3,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 2, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.5', 'ipv4_dst': '10.0.0.3', 'tcp_src': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:28:59] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.002467
+(6065) accepted ('127.0.0.1', 56636)
+Sending message with xid(dc7023a2) to datapath(0000000000000002): version=None,msg_type=None,msg_len=None,xid=0xdc7023a2,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=1,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 2, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.6', 'ipv4_dst': '10.0.0.2'}),out_group=4294967295,out_port=4294967295,priority=200,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:28:59] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.009834
+(6065) accepted ('127.0.0.1', 56648)
+Sending message with xid(dc7023a3) to datapath(0000000000000002): version=None,msg_type=None,msg_len=None,xid=0xdc7023a3,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=2,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 1, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.2', 'ipv4_dst': '10.0.0.6'}),out_group=4294967295,out_port=4294967295,priority=200,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:28:59] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.002440
+(6065) accepted ('127.0.0.1', 56662)
+Sending message with xid(dc7023a4) to datapath(0000000000000002): version=None,msg_type=None,msg_len=None,xid=0xdc7023a4,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=1,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 2, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.6', 'ipv4_dst': '10.0.0.2', 'tcp_dst': 5004}),out_group=4294967295,out_port=4294967295,priority=200,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:28:59] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.007372
+(6065) accepted ('127.0.0.1', 56666)
+Sending message with xid(dc7023a5) to datapath(0000000000000002): version=None,msg_type=None,msg_len=None,xid=0xdc7023a5,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=2,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 1, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.2', 'ipv4_dst': '10.0.0.6', 'tcp_src': 5004}),out_group=4294967295,out_port=4294967295,priority=200,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:28:59] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.009372
+(6065) accepted ('127.0.0.1', 56678)
+Sending message with xid(4ed6cf28) to datapath(0000000000000004): version=None,msg_type=None,msg_len=None,xid=0x4ed6cf28,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=3,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 1, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.4', 'ipv4_dst': '10.0.0.1'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.003888
+(6065) accepted ('127.0.0.1', 56690)
+Sending message with xid(4ed6cf29) to datapath(0000000000000004): version=None,msg_type=None,msg_len=None,xid=0x4ed6cf29,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=1,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 3, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.1', 'ipv4_dst': '10.0.0.4'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.002289
+(6065) accepted ('127.0.0.1', 56694)
+Sending message with xid(3050738e) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x3050738e,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=1,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 4, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.4', 'ipv4_dst': '10.0.0.1'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.002847
+(6065) accepted ('127.0.0.1', 56702)
+Sending message with xid(3050738f) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x3050738f,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=4,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 1, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.1', 'ipv4_dst': '10.0.0.4'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.002573
+(6065) accepted ('127.0.0.1', 56708)
+Sending message with xid(4ed6cf2a) to datapath(0000000000000004): version=None,msg_type=None,msg_len=None,xid=0x4ed6cf2a,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=3,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 1, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.4', 'ipv4_dst': '10.0.0.1', 'tcp_dst': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.002823
+(6065) accepted ('127.0.0.1', 56716)
+Sending message with xid(4ed6cf2b) to datapath(0000000000000004): version=None,msg_type=None,msg_len=None,xid=0x4ed6cf2b,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=1,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 3, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.1', 'ipv4_dst': '10.0.0.4', 'tcp_src': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.003864
+(6065) accepted ('127.0.0.1', 56728)
+Sending message with xid(30507390) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x30507390,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=1,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 4, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.4', 'ipv4_dst': '10.0.0.1', 'tcp_dst': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.004586
+(6065) accepted ('127.0.0.1', 56740)
+Sending message with xid(30507391) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x30507391,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=4,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 1, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.1', 'ipv4_dst': '10.0.0.4', 'tcp_src': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.012232
+(6065) accepted ('127.0.0.1', 56742)
+Sending message with xid(dc7023a6) to datapath(0000000000000002): version=None,msg_type=None,msg_len=None,xid=0xdc7023a6,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=3,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 1, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.2', 'ipv4_dst': '10.0.0.1'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.002553
+(6065) accepted ('127.0.0.1', 56754)
+Sending message with xid(dc7023a7) to datapath(0000000000000002): version=None,msg_type=None,msg_len=None,xid=0xdc7023a7,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=1,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 3, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.1', 'ipv4_dst': '10.0.0.2'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.003484
+(6065) accepted ('127.0.0.1', 56768)
+Sending message with xid(30507392) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x30507392,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=1,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 3, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.2', 'ipv4_dst': '10.0.0.1'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.003324
+(6065) accepted ('127.0.0.1', 56782)
+Sending message with xid(30507393) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x30507393,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=3,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 1, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.1', 'ipv4_dst': '10.0.0.2'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.003882
+(6065) accepted ('127.0.0.1', 56798)
+Sending message with xid(dc7023a8) to datapath(0000000000000002): version=None,msg_type=None,msg_len=None,xid=0xdc7023a8,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=3,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 1, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.2', 'ipv4_dst': '10.0.0.1', 'tcp_dst': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.002558
+(6065) accepted ('127.0.0.1', 56802)
+Sending message with xid(dc7023a9) to datapath(0000000000000002): version=None,msg_type=None,msg_len=None,xid=0xdc7023a9,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=1,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 3, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.1', 'ipv4_dst': '10.0.0.2', 'tcp_src': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.003379
+(6065) accepted ('127.0.0.1', 56818)
+Sending message with xid(30507394) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x30507394,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=1,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 3, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.2', 'ipv4_dst': '10.0.0.1', 'tcp_dst': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.002645
+(6065) accepted ('127.0.0.1', 56834)
+Sending message with xid(30507395) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x30507395,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=3,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 1, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.1', 'ipv4_dst': '10.0.0.2', 'tcp_src': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.003762
+(6065) accepted ('127.0.0.1', 56850)
+Sending message with xid(ac064b1f) to datapath(0000000000000003): version=None,msg_type=None,msg_len=None,xid=0xac064b1f,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=3,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 1, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.3', 'ipv4_dst': '10.0.0.4'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.005769
+(6065) accepted ('127.0.0.1', 56858)
+Sending message with xid(ac064b20) to datapath(0000000000000003): version=None,msg_type=None,msg_len=None,xid=0xac064b20,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=1,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 3, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.4', 'ipv4_dst': '10.0.0.3'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.003297
+(6065) accepted ('127.0.0.1', 56868)
+Sending message with xid(4ed6cf2c) to datapath(0000000000000004): version=None,msg_type=None,msg_len=None,xid=0x4ed6cf2c,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=1,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 2, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.3', 'ipv4_dst': '10.0.0.4'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.003679
+(6065) accepted ('127.0.0.1', 56884)
+Sending message with xid(4ed6cf2d) to datapath(0000000000000004): version=None,msg_type=None,msg_len=None,xid=0x4ed6cf2d,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=2,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 1, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.4', 'ipv4_dst': '10.0.0.3'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.015112
+(6065) accepted ('127.0.0.1', 56888)
+Sending message with xid(ac064b21) to datapath(0000000000000003): version=None,msg_type=None,msg_len=None,xid=0xac064b21,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=3,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 1, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.3', 'ipv4_dst': '10.0.0.4', 'tcp_dst': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.008081
+(6065) accepted ('127.0.0.1', 56900)
+Sending message with xid(ac064b22) to datapath(0000000000000003): version=None,msg_type=None,msg_len=None,xid=0xac064b22,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=1,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 3, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.4', 'ipv4_dst': '10.0.0.3', 'tcp_src': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.020777
+(6065) accepted ('127.0.0.1', 56906)
+Sending message with xid(4ed6cf2e) to datapath(0000000000000004): version=None,msg_type=None,msg_len=None,xid=0x4ed6cf2e,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=1,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 2, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.3', 'ipv4_dst': '10.0.0.4', 'tcp_dst': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.012994
+(6065) accepted ('127.0.0.1', 56922)
+Sending message with xid(4ed6cf2f) to datapath(0000000000000004): version=None,msg_type=None,msg_len=None,xid=0x4ed6cf2f,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=2,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 1, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.4', 'ipv4_dst': '10.0.0.3', 'tcp_src': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.003146
+(6065) accepted ('127.0.0.1', 56930)
+Sending message with xid(30507396) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x30507396,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=3,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 2, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.5', 'ipv4_dst': '10.0.0.6'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.002597
+(6065) accepted ('127.0.0.1', 56940)
+Sending message with xid(30507397) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x30507397,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=2,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 3, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.6', 'ipv4_dst': '10.0.0.5'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.002788
+(6065) accepted ('127.0.0.1', 56956)
+Sending message with xid(dc7023aa) to datapath(0000000000000002): version=None,msg_type=None,msg_len=None,xid=0xdc7023aa,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=2,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 3, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.5', 'ipv4_dst': '10.0.0.6'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.002186
+(6065) accepted ('127.0.0.1', 56966)
+Sending message with xid(dc7023ab) to datapath(0000000000000002): version=None,msg_type=None,msg_len=None,xid=0xdc7023ab,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=3,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 2, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.6', 'ipv4_dst': '10.0.0.5'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.010712
+(6065) accepted ('127.0.0.1', 56972)
+Sending message with xid(30507398) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x30507398,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=3,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 2, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.5', 'ipv4_dst': '10.0.0.6', 'tcp_dst': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.017404
+(6065) accepted ('127.0.0.1', 56982)
+Sending message with xid(30507399) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x30507399,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=2,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 3, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.6', 'ipv4_dst': '10.0.0.5', 'tcp_src': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.014282
+(6065) accepted ('127.0.0.1', 56988)
+Sending message with xid(dc7023ac) to datapath(0000000000000002): version=None,msg_type=None,msg_len=None,xid=0xdc7023ac,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=2,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 3, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.5', 'ipv4_dst': '10.0.0.6', 'tcp_dst': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.025614
+(6065) accepted ('127.0.0.1', 56994)
+Sending message with xid(dc7023ad) to datapath(0000000000000002): version=None,msg_type=None,msg_len=None,xid=0xdc7023ad,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=3,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 2, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.6', 'ipv4_dst': '10.0.0.5', 'tcp_src': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:29:00] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.010678
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+[WARNING] Packet-in for unhandled IP traffic: 10.0.0.1 -> 10.0.0.3 on DPID 1, in_port 1
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+[WARNING] Packet-in for unhandled IP traffic: 10.0.0.1 -> 10.0.0.5 on DPID 1, in_port 1
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+[WARNING] Packet-in for unhandled IP traffic: 10.0.0.1 -> 10.0.0.6 on DPID 1, in_port 1
+EVENT ofp_event->Controller EventOFPPacketIn
+[WARNING] Packet-in for unhandled IP traffic: 10.0.0.2 -> 10.0.0.3 on DPID 2, in_port 1
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+[WARNING] Packet-in for unhandled IP traffic: 10.0.0.2 -> 10.0.0.4 on DPID 2, in_port 1
+EVENT ofp_event->Controller EventOFPPacketIn
+[WARNING] Packet-in for unhandled IP traffic: 10.0.0.2 -> 10.0.0.5 on DPID 2, in_port 1
+EVENT ofp_event->Controller EventOFPPacketIn
+[WARNING] Packet-in for unhandled IP traffic: 10.0.0.3 -> 10.0.0.1 on DPID 3, in_port 1
+EVENT ofp_event->Controller EventOFPPacketIn
+[WARNING] Packet-in for unhandled IP traffic: 10.0.0.3 -> 10.0.0.2 on DPID 3, in_port 1
+EVENT ofp_event->Controller EventOFPPacketIn
+[WARNING] Packet-in for unhandled IP traffic: 10.0.0.4 -> 10.0.0.2 on DPID 4, in_port 1
+EVENT ofp_event->Controller EventOFPPacketIn
+[WARNING] Packet-in for unhandled IP traffic: 10.0.0.3 -> 10.0.0.6 on DPID 3, in_port 1
+EVENT ofp_event->Controller EventOFPPacketIn
+[WARNING] Packet-in for unhandled IP traffic: 10.0.0.1 -> 10.0.0.3 on DPID 1, in_port 1
+EVENT ofp_event->Controller EventOFPPacketIn
+[WARNING] Packet-in for unhandled IP traffic: 10.0.0.1 -> 10.0.0.5 on DPID 1, in_port 1
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+[WARNING] Packet-in for unhandled IP traffic: 10.0.0.1 -> 10.0.0.6 on DPID 1, in_port 1
+EVENT ofp_event->Controller EventOFPPacketIn
+[WARNING] Packet-in for unhandled IP traffic: 10.0.0.2 -> 10.0.0.3 on DPID 2, in_port 1
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+[WARNING] Packet-in for unhandled IP traffic: 10.0.0.2 -> 10.0.0.4 on DPID 2, in_port 1
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+[WARNING] Packet-in for unhandled IP traffic: 10.0.0.2 -> 10.0.0.5 on DPID 2, in_port 1
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+[WARNING] Packet-in for unhandled IP traffic: 10.0.0.3 -> 10.0.0.1 on DPID 3, in_port 1
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+[WARNING] Packet-in for unhandled IP traffic: 10.0.0.3 -> 10.0.0.2 on DPID 3, in_port 1
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+[WARNING] Packet-in for unhandled IP traffic: 10.0.0.3 -> 10.0.0.6 on DPID 3, in_port 1
+EVENT ofp_event->Controller EventOFPPacketIn
+[WARNING] Packet-in for unhandled IP traffic: 10.0.0.4 -> 10.0.0.2 on DPID 4, in_port 1
+EVENT ofp_event->Controller EventOFPPacketIn
+[WARNING] Packet-in for unhandled IP traffic: 10.0.0.4 -> 10.0.0.5 on DPID 4, in_port 1
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->Controller EventOFPPacketIn
+[WARNING] Packet-in for unhandled IP traffic: 10.0.0.4 -> 10.0.0.6 on DPID 4, in_port 1
+EVENT ofp_event->Controller EventOFPPacketIn
+[WARNING] Packet-in for unhandled IP traffic: 10.0.0.5 -> 10.0.0.1 on DPID 1, in_port 2
+EVENT ofp_event->Controller EventOFPPacketIn
+[WARNING] Packet-in for unhandled IP traffic: 10.0.0.5 -> 10.0.0.2 on DPID 1, in_port 2
+EVENT ofp_event->Controller EventOFPPacketIn
+[WARNING] Packet-in for unhandled IP traffic: 10.0.0.5 -> 10.0.0.4 on DPID 1, in_port 2
+(6065) accepted ('127.0.0.1', 47316)
+Sending message with xid(ac064b23) to datapath(0000000000000003): version=None,msg_type=None,msg_len=None,xid=0xac064b23,OFPFlowMod(buffer_id=4294967295,command=3,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=2,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 1, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.3', 'ipv4_dst': '10.0.0.5'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:33:57] "POST /stats/flowentry/delete HTTP/1.1" 200 139 0.015572
+(6065) accepted ('127.0.0.1', 47322)
+Sending message with xid(dc7023ae) to datapath(0000000000000002): version=None,msg_type=None,msg_len=None,xid=0xdc7023ae,OFPFlowMod(buffer_id=4294967295,command=3,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=3,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 4, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.3', 'ipv4_dst': '10.0.0.5'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:33:57] "POST /stats/flowentry/delete HTTP/1.1" 200 139 0.011500
+(6065) accepted ('127.0.0.1', 47336)
+Sending message with xid(3050739a) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x3050739a,OFPFlowMod(buffer_id=4294967295,command=3,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=2,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 3, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.3', 'ipv4_dst': '10.0.0.5'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:33:57] "POST /stats/flowentry/delete HTTP/1.1" 200 139 0.003997
+(6065) accepted ('127.0.0.1', 47338)
+Sending message with xid(ac064b24) to datapath(0000000000000003): version=None,msg_type=None,msg_len=None,xid=0xac064b24,OFPFlowMod(buffer_id=4294967295,command=3,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=1,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 2, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.5', 'ipv4_dst': '10.0.0.3'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:33:57] "POST /stats/flowentry/delete HTTP/1.1" 200 139 0.007002
+(6065) accepted ('127.0.0.1', 47352)
+Sending message with xid(dc7023af) to datapath(0000000000000002): version=None,msg_type=None,msg_len=None,xid=0xdc7023af,OFPFlowMod(buffer_id=4294967295,command=3,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=4,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 3, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.5', 'ipv4_dst': '10.0.0.3'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:33:58] "POST /stats/flowentry/delete HTTP/1.1" 200 139 0.013560
+(6065) accepted ('127.0.0.1', 47358)
+Sending message with xid(3050739b) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x3050739b,OFPFlowMod(buffer_id=4294967295,command=3,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=3,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 2, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.5', 'ipv4_dst': '10.0.0.3'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:33:58] "POST /stats/flowentry/delete HTTP/1.1" 200 139 0.018247
+(6065) accepted ('127.0.0.1', 47362)
+Sending message with xid(ac064b25) to datapath(0000000000000003): version=None,msg_type=None,msg_len=None,xid=0xac064b25,OFPFlowMod(buffer_id=4294967295,command=3,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=2,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 1, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.3', 'ipv4_dst': '10.0.0.5', 'tcp_dst': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:33:58] "POST /stats/flowentry/delete HTTP/1.1" 200 139 0.015164
+(6065) accepted ('127.0.0.1', 47370)
+Sending message with xid(dc7023b0) to datapath(0000000000000002): version=None,msg_type=None,msg_len=None,xid=0xdc7023b0,OFPFlowMod(buffer_id=4294967295,command=3,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=3,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 4, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.3', 'ipv4_dst': '10.0.0.5', 'tcp_dst': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:33:58] "POST /stats/flowentry/delete HTTP/1.1" 200 139 0.013121
+(6065) accepted ('127.0.0.1', 47372)
+Sending message with xid(3050739c) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x3050739c,OFPFlowMod(buffer_id=4294967295,command=3,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=2,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 3, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.3', 'ipv4_dst': '10.0.0.5', 'tcp_dst': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:33:58] "POST /stats/flowentry/delete HTTP/1.1" 200 139 0.011621
+(6065) accepted ('127.0.0.1', 47386)
+Sending message with xid(ac064b26) to datapath(0000000000000003): version=None,msg_type=None,msg_len=None,xid=0xac064b26,OFPFlowMod(buffer_id=4294967295,command=3,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=1,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 2, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.5', 'ipv4_dst': '10.0.0.3', 'tcp_src': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:33:58] "POST /stats/flowentry/delete HTTP/1.1" 200 139 0.014033
+(6065) accepted ('127.0.0.1', 47394)
+Sending message with xid(dc7023b1) to datapath(0000000000000002): version=None,msg_type=None,msg_len=None,xid=0xdc7023b1,OFPFlowMod(buffer_id=4294967295,command=3,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=4,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 3, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.5', 'ipv4_dst': '10.0.0.3', 'tcp_src': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:33:58] "POST /stats/flowentry/delete HTTP/1.1" 200 139 0.002442
+(6065) accepted ('127.0.0.1', 47410)
+Sending message with xid(3050739d) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x3050739d,OFPFlowMod(buffer_id=4294967295,command=3,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=3,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 2, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.5', 'ipv4_dst': '10.0.0.3', 'tcp_src': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:33:58] "POST /stats/flowentry/delete HTTP/1.1" 200 139 0.011979
+(6065) accepted ('127.0.0.1', 47326)
+Sending message with xid(dc7023b2) to datapath(0000000000000002): version=None,msg_type=None,msg_len=None,xid=0xdc7023b2,OFPFlowMod(buffer_id=4294967295,command=3,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=1,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 2, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.6', 'ipv4_dst': '10.0.0.2'}),out_group=4294967295,out_port=4294967295,priority=200,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:34:04] "POST /stats/flowentry/delete HTTP/1.1" 200 139 0.012773
+(6065) accepted ('127.0.0.1', 47334)
+Sending message with xid(dc7023b3) to datapath(0000000000000002): version=None,msg_type=None,msg_len=None,xid=0xdc7023b3,OFPFlowMod(buffer_id=4294967295,command=3,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=2,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 1, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.2', 'ipv4_dst': '10.0.0.6'}),out_group=4294967295,out_port=4294967295,priority=200,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:34:05] "POST /stats/flowentry/delete HTTP/1.1" 200 139 0.012418
+(6065) accepted ('127.0.0.1', 47350)
+Sending message with xid(dc7023b4) to datapath(0000000000000002): version=None,msg_type=None,msg_len=None,xid=0xdc7023b4,OFPFlowMod(buffer_id=4294967295,command=3,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=1,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 2, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.6', 'ipv4_dst': '10.0.0.2', 'tcp_dst': 5004}),out_group=4294967295,out_port=4294967295,priority=200,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:34:05] "POST /stats/flowentry/delete HTTP/1.1" 200 139 0.009615
+(6065) accepted ('127.0.0.1', 47356)
+Sending message with xid(dc7023b5) to datapath(0000000000000002): version=None,msg_type=None,msg_len=None,xid=0xdc7023b5,OFPFlowMod(buffer_id=4294967295,command=3,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=2,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 1, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.2', 'ipv4_dst': '10.0.0.6', 'tcp_src': 5004}),out_group=4294967295,out_port=4294967295,priority=200,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:34:05] "POST /stats/flowentry/delete HTTP/1.1" 200 139 0.019484
+EVENT ofp_event->Controller EventOFPPacketIn
+[WARNING] Packet-in for unhandled IP traffic: 10.0.0.6 -> 10.0.0.1 on DPID 2, in_port 2
+EVENT ofp_event->Controller EventOFPPacketIn
+[WARNING] Packet-in for unhandled IP traffic: 10.0.0.6 -> 10.0.0.2 on DPID 2, in_port 2
+(6065) accepted ('127.0.0.1', 47638)
+Sending message with xid(4ed6cf30) to datapath(0000000000000004): version=None,msg_type=None,msg_len=None,xid=0x4ed6cf30,OFPFlowMod(buffer_id=4294967295,command=3,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=3,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 1, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.4', 'ipv4_dst': '10.0.0.1'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:34:26] "POST /stats/flowentry/delete HTTP/1.1" 200 139 0.003588
+(6065) accepted ('127.0.0.1', 47644)
+Sending message with xid(3050739e) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x3050739e,OFPFlowMod(buffer_id=4294967295,command=3,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=1,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 4, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.4', 'ipv4_dst': '10.0.0.1'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:34:26] "POST /stats/flowentry/delete HTTP/1.1" 200 139 0.004424
+(6065) accepted ('127.0.0.1', 47656)
+Sending message with xid(4ed6cf31) to datapath(0000000000000004): version=None,msg_type=None,msg_len=None,xid=0x4ed6cf31,OFPFlowMod(buffer_id=4294967295,command=3,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=1,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 3, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.1', 'ipv4_dst': '10.0.0.4'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:34:26] "POST /stats/flowentry/delete HTTP/1.1" 200 139 0.002766
+(6065) accepted ('127.0.0.1', 47668)
+Sending message with xid(3050739f) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x3050739f,OFPFlowMod(buffer_id=4294967295,command=3,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=4,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 1, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.1', 'ipv4_dst': '10.0.0.4'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:34:26] "POST /stats/flowentry/delete HTTP/1.1" 200 139 0.013273
+(6065) accepted ('127.0.0.1', 47680)
+Sending message with xid(4ed6cf32) to datapath(0000000000000004): version=None,msg_type=None,msg_len=None,xid=0x4ed6cf32,OFPFlowMod(buffer_id=4294967295,command=3,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=3,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 1, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.4', 'ipv4_dst': '10.0.0.1', 'tcp_dst': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:34:26] "POST /stats/flowentry/delete HTTP/1.1" 200 139 0.012280
+(6065) accepted ('127.0.0.1', 47694)
+Sending message with xid(305073a0) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x305073a0,OFPFlowMod(buffer_id=4294967295,command=3,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=1,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 4, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.4', 'ipv4_dst': '10.0.0.1', 'tcp_dst': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:34:26] "POST /stats/flowentry/delete HTTP/1.1" 200 139 0.007181
+(6065) accepted ('127.0.0.1', 47700)
+Sending message with xid(4ed6cf33) to datapath(0000000000000004): version=None,msg_type=None,msg_len=None,xid=0x4ed6cf33,OFPFlowMod(buffer_id=4294967295,command=3,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=1,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 3, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.1', 'ipv4_dst': '10.0.0.4', 'tcp_src': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:34:26] "POST /stats/flowentry/delete HTTP/1.1" 200 139 0.022294
+(6065) accepted ('127.0.0.1', 47714)
+Sending message with xid(305073a1) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x305073a1,OFPFlowMod(buffer_id=4294967295,command=3,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=4,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 1, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.1', 'ipv4_dst': '10.0.0.4', 'tcp_src': 5004}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:34:26] "POST /stats/flowentry/delete HTTP/1.1" 200 139 0.006764
+(6065) accepted ('127.0.0.1', 47730)
+Sending message with xid(4ed6cf34) to datapath(0000000000000004): version=None,msg_type=None,msg_len=None,xid=0x4ed6cf34,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=3,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 1, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.4', 'ipv4_dst': '10.0.0.1'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:34:27] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.003287
+(6065) accepted ('127.0.0.1', 47742)
+Sending message with xid(4ed6cf35) to datapath(0000000000000004): version=None,msg_type=None,msg_len=None,xid=0x4ed6cf35,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=1,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 3, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.1', 'ipv4_dst': '10.0.0.4'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:34:27] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.002942
+(6065) accepted ('127.0.0.1', 47748)
+Sending message with xid(305073a2) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x305073a2,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=1,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 4, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.4', 'ipv4_dst': '10.0.0.1'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:34:27] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.028279
+(6065) accepted ('127.0.0.1', 47758)
+Sending message with xid(305073a3) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x305073a3,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=4,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 1, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.1', 'ipv4_dst': '10.0.0.4'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:34:27] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.013536
+(6065) accepted ('127.0.0.1', 47766)
+Sending message with xid(4ed6cf36) to datapath(0000000000000004): version=None,msg_type=None,msg_len=None,xid=0x4ed6cf36,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=3,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 1, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.4', 'ipv4_dst': '10.0.0.5'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:34:27] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.010458
+(6065) accepted ('127.0.0.1', 47776)
+Sending message with xid(4ed6cf37) to datapath(0000000000000004): version=None,msg_type=None,msg_len=None,xid=0x4ed6cf37,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=1,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 3, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.5', 'ipv4_dst': '10.0.0.4'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:34:27] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.045043
+(6065) accepted ('127.0.0.1', 47784)
+Sending message with xid(305073a4) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x305073a4,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=2,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 4, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.4', 'ipv4_dst': '10.0.0.5'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:34:27] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.033322
+(6065) accepted ('127.0.0.1', 47790)
+Sending message with xid(305073a5) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x305073a5,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=4,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 2, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.5', 'ipv4_dst': '10.0.0.4'}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:34:27] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.026527
+(6065) accepted ('127.0.0.1', 47798)
+Sending message with xid(305073a6) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x305073a6,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=2,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 1, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.1', 'ipv4_dst': '10.0.0.5'}),out_group=4294967295,out_port=4294967295,priority=200,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:34:27] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.016473
+(6065) accepted ('127.0.0.1', 47804)
+Sending message with xid(305073a7) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x305073a7,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=1,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 2, 'eth_type': 2048, 'ip_proto': 1, 'ipv4_src': '10.0.0.5', 'ipv4_dst': '10.0.0.1'}),out_group=4294967295,out_port=4294967295,priority=200,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:34:27] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.019021
+(6065) accepted ('127.0.0.1', 47806)
+Sending message with xid(305073a8) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x305073a8,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=4,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 2, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.5', 'ipv4_dst': '10.0.0.4', 'tcp_dst': 5002}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:34:27] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.041373
+(6065) accepted ('127.0.0.1', 47812)
+Sending message with xid(305073a9) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x305073a9,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=2,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 4, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.4', 'ipv4_dst': '10.0.0.5', 'tcp_src': 5002}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:34:27] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.012645
+(6065) accepted ('127.0.0.1', 47816)
+Sending message with xid(4ed6cf38) to datapath(0000000000000004): version=None,msg_type=None,msg_len=None,xid=0x4ed6cf38,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=1,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 3, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.5', 'ipv4_dst': '10.0.0.4', 'tcp_dst': 5002}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:34:27] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.017485
+(6065) accepted ('127.0.0.1', 47824)
+Sending message with xid(4ed6cf39) to datapath(0000000000000004): version=None,msg_type=None,msg_len=None,xid=0x4ed6cf39,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=3,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 1, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.4', 'ipv4_dst': '10.0.0.5', 'tcp_src': 5002}),out_group=4294967295,out_port=4294967295,priority=100,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:34:27] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.013659
+(6065) accepted ('127.0.0.1', 47830)
+Sending message with xid(305073aa) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x305073aa,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=1,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 2, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.5', 'ipv4_dst': '10.0.0.1', 'tcp_dst': 5003}),out_group=4294967295,out_port=4294967295,priority=200,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:34:27] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.010761
+(6065) accepted ('127.0.0.1', 47844)
+Sending message with xid(305073ab) to datapath(0000000000000001): version=None,msg_type=None,msg_len=None,xid=0x305073ab,OFPFlowMod(buffer_id=4294967295,command=0,cookie=0,cookie_mask=0,flags=0,hard_timeout=0,idle_timeout=0,instructions=[OFPInstructionActions(actions=[OFPActionOutput(len=16,max_len=65509,port=2,type=0)],type=4)],match=OFPMatch(oxm_fields={'in_port': 1, 'eth_type': 2048, 'ip_proto': 6, 'ipv4_src': '10.0.0.1', 'ipv4_dst': '10.0.0.5', 'tcp_src': 5003}),out_group=4294967295,out_port=4294967295,priority=200,table_id=0)
+127.0.0.1 - - [01/Jul/2025 13:34:27] "POST /stats/flowentry/add HTTP/1.1" 200 139 0.017673
+EVENT ofp_event->Controller EventOFPPacketIn
+EVENT ofp_event->dpset EventOFPPortStatus
+DPSET: A port was modified.(datapath id = 0000000000000001, port number = 1)
+EVENT ofp_event->dpset EventOFPPortStatus
+DPSET: A port was deleted.(datapath id = 0000000000000001, port number = 1)
+EVENT ofp_event->dpset EventOFPPortStatus
+DPSET: A port was deleted.(datapath id = 0000000000000002, port number = 1)
+EVENT ofp_event->dpset EventOFPPortStatus
+EVENT ofp_event->dpset EventOFPPortStatus
+DPSET: A port was modified.(datapath id = 0000000000000003, port number = 1)
+DPSET: A port was deleted.(datapath id = 0000000000000003, port number = 1)
+EVENT ofp_event->dpset EventOFPPortStatus
+DPSET: A port was modified.(datapath id = 0000000000000004, port number = 1)
+EVENT ofp_event->dpset EventOFPPortStatus
+DPSET: A port was deleted.(datapath id = 0000000000000004, port number = 1)
+EVENT ofp_event->dpset EventOFPPortStatus
+DPSET: A port was deleted.(datapath id = 0000000000000001, port number = 2)
+EVENT ofp_event->dpset EventOFPPortStatus
+DPSET: A port was deleted.(datapath id = 0000000000000002, port number = 2)
+EVENT ofp_event->dpset EventOFPPortStatus
+EVENT ofp_event->dpset EventOFPPortStatus
+DPSET: A port was deleted.(datapath id = 0000000000000002, port number = 3)
+DPSET: A port was deleted.(datapath id = 0000000000000001, port number = 3)
+EVENT ofp_event->dpset EventOFPPortStatus
+DPSET: A port was deleted.(datapath id = 0000000000000004, port number = 2)
+EVENT ofp_event->dpset EventOFPPortStatus
+EVENT ofp_event->dpset EventOFPPortStatus
+DPSET: A port was deleted.(datapath id = 0000000000000003, port number = 2)
+DPSET: A port was deleted.(datapath id = 0000000000000003, port number = 3)
+EVENT ofp_event->dpset EventOFPPortStatus
+DPSET: A port was deleted.(datapath id = 0000000000000002, port number = 4)
+EVENT ofp_event->dpset EventOFPPortStatus
+DPSET: A port was modified.(datapath id = 0000000000000004, port number = 3)
+EVENT ofp_event->dpset EventOFPPortStatus
+DPSET: A port was deleted.(datapath id = 0000000000000004, port number = 3)
+EVENT ofp_event->dpset EventOFPPortStatus
+EVENT ofp_event->dpset EventOFPPortStatus
+DPSET: A port was modified.(datapath id = 0000000000000001, port number = 4)
+DPSET: A port was deleted.(datapath id = 0000000000000001, port number = 4)
+EVENT ofp_event->dpset EventOFPStateChange
+DPSET: unregister datapath <ryu.controller.controller.Datapath object at 0x7f8fcc6a5880>
+EVENT ofp_event->dpset EventOFPStateChange
+DPSET: unregister datapath <ryu.controller.controller.Datapath object at 0x7f8fcc5dcf10>
+EVENT ofp_event->dpset EventOFPStateChange
+DPSET: unregister datapath <ryu.controller.controller.Datapath object at 0x7f8fcc5ed3a0>
+EVENT ofp_event->dpset EventOFPStateChange
+DPSET: unregister datapath <ryu.controller.controller.Datapath object at 0x7f8fcc68de20>
