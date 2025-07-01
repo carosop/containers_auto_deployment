@@ -1,24 +1,18 @@
-import time
-import os
 import socket
 import sys
-from datetime import datetime
+import os
+import time
 
-# Define the port for the date fetcher
-PORT = 5002
+# Define the port for colab_b to listen on
+PORT = 5004
 # Bind to 0.0.0.0
 HOST = "0.0.0.0"
 
-def fetch_date():
-    """Returns the current date in YYYY-MM-DD format."""
-    return datetime.now().strftime('%Y-%m-%d')
-
 if __name__ == "__main__":
     # Ensure standard output is flushed immediately
-    sys.stdout.flush() 
-    print(f"Date Fetcher started. Listening on {HOST}:{PORT}")
+    sys.stdout.flush()
+    print(f"Colab B server started. Listening on {HOST}:{PORT}")
 
-    # Create a TCP/IP socket
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # Allow reuse of address
         s.bind((HOST, PORT))
@@ -28,7 +22,9 @@ if __name__ == "__main__":
             conn, addr = s.accept()
             with conn:
                 print(f"Connected by {addr} on port {PORT}")
-                date_str = fetch_date()
-                conn.sendall(date_str.encode())
-                print(f"Sent date: {date_str}")
+                data = conn.recv(1024).decode()
+                print(f"Colab B received: {data}")
+                response = f"Colab B received your message: '{data}'"
+                conn.sendall(response.encode())
+                print(f"Colab B sent: {response}")
             time.sleep(1)

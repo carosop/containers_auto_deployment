@@ -1,115 +1,132 @@
-import subprocess
 from mininet.link import TCLink
+from mininet.node import Host # Import Host for standard Mininet hosts
+import subprocess
+import os
+import time
+import requests
 
 class MyTopo:
-    def build(self, net):
-        """
-        Define the SDN topology with multiple switches and hosts.
-        """
+    """
+    Defines a simple SDN topology with multiple switches and standard hosts.
+    Each host is connected to a switch, and switches are connected in a ring.
+    """
+    def build(self, net, num_hosts, num_switches):
         # Switches
-        s1 = net.addSwitch("s1", protocols="OpenFlow13", stp=True)
-        s2 = net.addSwitch("s2", protocols="OpenFlow13", stp=True)
-        s3 = net.addSwitch("s3", protocols="OpenFlow13", stp=True)
-        s4 = net.addSwitch("s4", protocols="OpenFlow13", stp=True)
+        switches = []
+        for i in range(1, num_switches + 1):
+            switch = net.addSwitch(f"s{i}")
+            switches.append(switch)
+            
+        for i in range(1, num_hosts + 1):
+            net.addHost(f"h{i}") 
 
-        # Docker hosts
-        h1 = net.addDockerHost("h1", ip="10.0.0.1", dimage="auto_deployment", docker_args={"hostname": "h1"})
-        h2 = net.addDockerHost("h2", ip="10.0.0.2", dimage="auto_deployment", docker_args={"hostname": "h2"})
-        h3 = net.addDockerHost("h3", ip="10.0.0.3", dimage="auto_deployment", docker_args={"hostname": "h3"})
-        h4 = net.addDockerHost("h4", ip="10.0.0.4", dimage="auto_deployment", docker_args={"hostname": "h4"})
-        h5 = net.addDockerHost("h5", ip="10.0.0.5", dimage="auto_deployment", docker_args={"hostname": "h5"})
-        h6 = net.addDockerHost("h6", ip="10.0.0.6", dimage="auto_deployment", docker_args={"hostname": "h6"})
-        # h1 = net.addDockerHost("h1", ip="10.0.0.1", dimage="dev_test", docker_args={"hostname": "h1"})
-        # h2 = net.addDockerHost("h2", ip="10.0.0.2", dimage="dev_test", docker_args={"hostname": "h2"})
-        # h3 = net.addDockerHost("h3", ip="10.0.0.3", dimage="dev_test", docker_args={"hostname": "h3"})
-        # h4 = net.addDockerHost("h4", ip="10.0.0.4", dimage="dev_test", docker_args={"hostname": "h4"})
-        # h5 = net.addDockerHost("h5", ip="10.0.0.5", dimage="dev_test", docker_args={"hostname": "h5"})
-        # h6 = net.addDockerHost("h6", ip="10.0.0.6", dimage="dev_test", docker_args={"hostname": "h6"})
-        
         # Links
-        net.addLink(h1, s1, cls=TCLink, bw=50, delay="10ms")
-        net.addLink(h2, s2, cls=TCLink, bw=50, delay="10ms")
-        net.addLink(h3, s2, cls=TCLink, bw=50, delay="10ms")
-        net.addLink(h4, s3, cls=TCLink, bw=50, delay="10ms")
-        net.addLink(h5, s4, cls=TCLink, bw=50, delay="10ms")
-        net.addLink(h6, s4, cls=TCLink, bw=50, delay="10ms")
-        net.addLink(s4, s1, cls=TCLink, bw=100, delay="5ms")
-        net.addLink(s1, s2, cls=TCLink, bw=100, delay="5ms")
-        net.addLink(s2, s3, cls=TCLink, bw=100, delay="5ms")
-        net.addLink(s3, s4, cls=TCLink, bw=100, delay="5ms")   
+        # Connect each host to a switch in a round-robin manner
+        for i in range(1, num_hosts + 1):
+            host = net.get(f"h{i}") 
+            # Connect the host to a switch, using TCLink for bandwidth and delay
+            net.addLink(host, switches[(i - 1) % num_switches], cls=TCLink, bw=50, delay="10ms")
+
+        # Connect each switch to the next switch in a circular manner (ring topology)
+        for i in range(num_switches):
+            net.addLink(switches[i], switches[(i + 1) % num_switches], cls=TCLink, bw=100, delay="5ms")
 
 class ComplexTopo:
-    def build(self, net):
-        """
-        Define a more complex SDN topology.
-        """
-        # Switches
-        s1 = net.addSwitch("s1", protocols="OpenFlow13", stp=True)
-        s2 = net.addSwitch("s2", protocols="OpenFlow13", stp=True)
-        s3 = net.addSwitch("s3", protocols="OpenFlow13", stp=True)
-        s4 = net.addSwitch("s4", protocols="OpenFlow13", stp=True)
-        s5 = net.addSwitch("s5", protocols="OpenFlow13", stp=True)
-        s6 = net.addSwitch("s6", protocols="OpenFlow13", stp=True)
+    """
+    Defines a more complex SDN topology with multiple switches and standard hosts.
+    This example uses a spine-leaf architecture.
+    """
+    def build(self, net, num_hosts, num_switches):
+        # Ensure at least 2 switches for spine-leaf (one spine, one leaf)
+        if num_switches < 2:
+            num_switches = 2
+            print("[WARNING] Complex topology requires at least 2 switches. Setting num_switches to 2.")
 
-        # Docker hosts
-        h1 = net.addDockerHost("h1", ip="10.0.0.1", dimage="auto_deployment", docker_args={"hostname": "h1"})
-        h2 = net.addDockerHost("h2", ip="10.0.0.2", dimage="auto_deployment", docker_args={"hostname": "h2"})
-        h3 = net.addDockerHost("h3", ip="10.0.0.3", dimage="auto_deployment", docker_args={"hostname": "h3"})
-        h4 = net.addDockerHost("h4", ip="10.0.0.4", dimage="auto_deployment", docker_args={"hostname": "h4"})
-        h5 = net.addDockerHost("h5", ip="10.0.0.5", dimage="auto_deployment", docker_args={"hostname": "h5"})
-        h6 = net.addDockerHost("h6", ip="10.0.0.6", dimage="auto_deployment", docker_args={"hostname": "h6"})
-        h7 = net.addDockerHost("h7", ip="10.0.0.7", dimage="auto_deployment", docker_args={"hostname": "h7"})
-        h8 = net.addDockerHost("h8", ip="10.0.0.8", dimage="auto_deployment", docker_args={"hostname": "h8"})
-        
-        # Links
-        net.addLink(h1, s1, cls=TCLink, bw=50, delay="10ms")
-        net.addLink(h2, s2, cls=TCLink, bw=50, delay="10ms")
-        net.addLink(h3, s3, cls=TCLink, bw=50, delay="10ms")
-        net.addLink(h4, s4, cls=TCLink, bw=50, delay="10ms")
-        net.addLink(h5, s5, cls=TCLink, bw=50, delay="10ms")
-        net.addLink(h6, s6, cls=TCLink, bw=50, delay="10ms")
-        net.addLink(h7, s1, cls=TCLink, bw=50, delay="10ms")
-        net.addLink(h8, s2, cls=TCLink, bw=50, delay="10ms")
-        net.addLink(s1, s2, cls=TCLink, bw=100, delay="5ms")
-        net.addLink(s2, s3, cls=TCLink, bw=100, delay="5ms")
-        net.addLink(s3, s4, cls=TCLink, bw=100, delay="5ms")
-        net.addLink(s4, s5, cls=TCLink, bw=100, delay="5ms")
-        net.addLink(s5, s6, cls=TCLink, bw=100, delay="5ms")
-        net.addLink(s6, s1, cls=TCLink, bw=100, delay="5ms")
-        net.addLink(s1, s3, cls=TCLink, bw=100, delay="5ms")
-        net.addLink(s2, s4, cls=TCLink, bw=100, delay="5ms")
-        net.addLink(s3, s5, cls=TCLink, bw=100, delay="5ms")
-        net.addLink(s4, s6, cls=TCLink, bw=100, delay="5ms")
+        spine_switches = []
+        leaf_switches = []
 
+        # Assuming num_switches is split into spine and leaf (e.g., half each)
+        num_spine = max(1, num_switches // 2)
+        num_leaf = max(1, num_switches - num_spine)
+
+        # Spine Switches
+        for i in range(1, num_spine + 1):
+            switch = net.addSwitch(f"s_spine{i}")
+            spine_switches.append(switch)
+
+        # Leaf Switches
+        for i in range(1, num_leaf + 1):
+            switch = net.addSwitch(f"s_leaf{i}")
+            leaf_switches.append(switch)
+
+        # Standard Mininet hosts
+        hosts = []
+        for i in range(1, num_hosts + 1):
+            host = net.addHost(f"h{i}")
+            hosts.append(host)
+
+        # Connect hosts to leaf switches
+        for i, host in enumerate(hosts):
+            # Distribute hosts among leaf switches
+            net.addLink(host, leaf_switches[i % num_leaf], cls=TCLink, bw=50, delay="10ms")
+
+        # Connect leaf switches to spine switches (full mesh between spine and leaf)
+        for leaf_s in leaf_switches:
+            for spine_s in spine_switches:
+                net.addLink(leaf_s, spine_s, cls=TCLink, bw=100, delay="5ms")
 
 def build_topology(topology_type, net):
     """
-    Build the desired topology
+    Builds the selected network topology.
+
+    Args:
+        topology_type: A string indicating the topology type ("simple" or "complex").
+        net: The Mininet network object to build the topology on.
     """
     if topology_type == "simple":
         topo = MyTopo()
+        topo.build(net, num_hosts=6, num_switches=4) 
     elif topology_type == "complex":
         topo = ComplexTopo()
+        topo.build(net, num_hosts=8, num_switches=6) 
     else:
         raise ValueError(f"Unknown topology type: {topology_type}")
-    
-    topo.build(net)
 
 def start_ryu_controller():
     """
-    Start the Ryu controller.
+    Starts the Ryu controller as a subprocess.
     """
-    path = "/usr/lib/python3/dist-packages/ryu/app/simple_switch_stp_13.py"
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    path = os.path.join(script_dir, "controller.py")
+    
     try:
         print("[INFO] Starting Ryu controller...")
         process = subprocess.Popen(
-            ["ryu-manager", path],
+            ["ryu-manager", "--verbose", path, "ryu.app.rest_conf_switch", "ryu.app.ofctl_rest"],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
+            preexec_fn=os.setsid
         )
         print("[INFO] Ryu controller started.")
-        return process
+        print("[INFO] Waiting for Ryu controller REST API to be ready...")
+
+        # Wait for REST API to be up (max 20 seconds)
+        for _ in range(20):
+            try:
+                resp = requests.get("http://localhost:8080/stats/switches", timeout=1)
+                if resp.status_code == 200:
+                    print("[INFO] Ryu REST API is up.")
+                    return process
+            except Exception:
+                pass
+            time.sleep(1)
+
+        print("[ERROR] Ryu controller REST API did not become ready in time!")
+        out, err = process.communicate(timeout=2)
+        print("STDOUT:", out)
+        print("STDERR:", err)
+        return None
     except Exception as e:
         print(f"[ERROR] Failed to start Ryu controller: {e}")
         raise

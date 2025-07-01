@@ -42,7 +42,7 @@ containers_auto_deployment
    git clone <repository-url>
    cd containers_auto_deployment
    ```
-
+# TODO change readme --> controller internal
 3. **Check the Comnetsemu version**: <br />
    This project was developed on Ubuntu 20.04 with Comnetsemu (ubuntu-20.04-comnetsemu). <br />
    Ensure that the Ryu controller is located at:
@@ -66,6 +66,7 @@ containers_auto_deployment
 
 4. **Build the Docker image:**
    ```bash
+   sudo python3 -m pip install networkx
    docker build -t auto_deployment .
    ```
 

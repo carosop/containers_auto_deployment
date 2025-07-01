@@ -1,0 +1,75 @@
+loading app src/controller.py
+loading app ryu.app.rest_conf_switch
+loading app ryu.app.ofctl_rest
+loading app ryu.controller.ofp_handler
+instantiating app None of ConfSwitchSet
+creating context conf_switch
+instantiating app None of DPSet
+creating context dpset
+creating context wsgi
+instantiating app src/controller.py of Controller
+instantiating app ryu.app.rest_conf_switch of ConfSwitchAPI
+instantiating app ryu.app.ofctl_rest of RestStatsApi
+instantiating app ryu.controller.ofp_handler of OFPHandler
+BRICK conf_switch
+BRICK dpset
+  CONSUMES EventOFPStateChange
+  CONSUMES EventOFPPortStatus
+  CONSUMES EventOFPSwitchFeatures
+BRICK Controller
+  CONSUMES EventOFPPacketIn
+  CONSUMES EventOFPSwitchFeatures
+BRICK ConfSwitchAPI
+BRICK RestStatsApi
+  CONSUMES EventOFPSwitchFeatures
+  CONSUMES EventOFPQueueGetConfigReply
+  CONSUMES EventOFPRoleReply
+  CONSUMES EventOFPStatsReply
+  CONSUMES EventOFPDescStatsReply
+  CONSUMES EventOFPFlowStatsReply
+  CONSUMES EventOFPAggregateStatsReply
+  CONSUMES EventOFPTableStatsReply
+  CONSUMES EventOFPTableFeaturesStatsReply
+  CONSUMES EventOFPPortStatsReply
+  CONSUMES EventOFPQueueStatsReply
+  CONSUMES EventOFPQueueDescStatsReply
+  CONSUMES EventOFPMeterStatsReply
+  CONSUMES EventOFPMeterFeaturesStatsReply
+  CONSUMES EventOFPMeterConfigStatsReply
+  CONSUMES EventOFPGroupStatsReply
+  CONSUMES EventOFPGroupFeaturesStatsReply
+  CONSUMES EventOFPGroupDescStatsReply
+  CONSUMES EventOFPPortDescStatsReply
+BRICK ofp_event
+  PROVIDES EventOFPStateChange TO {'dpset': {'main', 'dead'}}
+  PROVIDES EventOFPPortStatus TO {'dpset': {'main'}}
+  PROVIDES EventOFPSwitchFeatures TO {'dpset': {'config'}, 'Controller': {'config'}, 'RestStatsApi': {'main'}}
+  PROVIDES EventOFPPacketIn TO {'Controller': {'main'}}
+  PROVIDES EventOFPQueueGetConfigReply TO {'RestStatsApi': {'main'}}
+  PROVIDES EventOFPRoleReply TO {'RestStatsApi': {'main'}}
+  PROVIDES EventOFPStatsReply TO {'RestStatsApi': {'main'}}
+  PROVIDES EventOFPDescStatsReply TO {'RestStatsApi': {'main'}}
+  PROVIDES EventOFPFlowStatsReply TO {'RestStatsApi': {'main'}}
+  PROVIDES EventOFPAggregateStatsReply TO {'RestStatsApi': {'main'}}
+  PROVIDES EventOFPTableStatsReply TO {'RestStatsApi': {'main'}}
+  PROVIDES EventOFPTableFeaturesStatsReply TO {'RestStatsApi': {'main'}}
+  PROVIDES EventOFPPortStatsReply TO {'RestStatsApi': {'main'}}
+  PROVIDES EventOFPQueueStatsReply TO {'RestStatsApi': {'main'}}
+  PROVIDES EventOFPQueueDescStatsReply TO {'RestStatsApi': {'main'}}
+  PROVIDES EventOFPMeterStatsReply TO {'RestStatsApi': {'main'}}
+  PROVIDES EventOFPMeterFeaturesStatsReply TO {'RestStatsApi': {'main'}}
+  PROVIDES EventOFPMeterConfigStatsReply TO {'RestStatsApi': {'main'}}
+  PROVIDES EventOFPGroupStatsReply TO {'RestStatsApi': {'main'}}
+  PROVIDES EventOFPGroupFeaturesStatsReply TO {'RestStatsApi': {'main'}}
+  PROVIDES EventOFPGroupDescStatsReply TO {'RestStatsApi': {'main'}}
+  PROVIDES EventOFPPortDescStatsReply TO {'RestStatsApi': {'main'}}
+  CONSUMES EventOFPEchoReply
+  CONSUMES EventOFPEchoRequest
+  CONSUMES EventOFPErrorMsg
+  CONSUMES EventOFPHello
+  CONSUMES EventOFPPortDescStatsReply
+  CONSUMES EventOFPPortStatus
+  CONSUMES EventOFPSwitchFeatures
+(12832) wsgi starting up on http://0.0.0.0:8080
+(12832) accepted ('127.0.0.1', 40480)
+127.0.0.1 - - [30/Jun/2025 17:55:27] "GET /stats/switches HTTP/1.1" 200 109 0.012180

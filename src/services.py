@@ -1,565 +1,390 @@
-import docker
-import random
-import requests
-import subprocess
-import json
 import os
+import time
+import signal
+import subprocess
+import random
+from flow import FlowManager
 
-# Track flows between services
-flows = {}
-container_counter = {}
-service_instances = {}
-should_deploy_colab = True
-
-service_counters = {
-    "web": 0,
-    "random": 0,
-    "datetime": 0,
-    "colab": 0
-}
-service_definitions = {
-    "web": [
-        ("database", 
-            "import os; "
-            "os.system('python3 /shared/scripts/database.py')"),
-        ("webserver", 
-            "import os; "
-            "os.system('python3 /shared/scripts/web_server.py')")  
-    ],
-    "random": [
-        ("random_gen1", 
-            "import os; "
-            "os.system('python3 /shared/scripts/random_gen1.py')"),
-        ("random_gen2", 
-            "import os; "
-            "os.system('python3 /shared/scripts/random_gen2.py')"),
-        ("random_sum", 
-            "import os; "
-            "os.system('python3 /shared/scripts/random_sum.py')")
-    ],
-    "datetime": [
-        ("date_fetcher", 
-            "import os; "
-            "os.system('python3 /shared/scripts/date_fetcher.py')"),
-        ("time_fetcher", 
-            "import os; "
-            "os.system('python3 /shared/scripts/time_fetcher.py')"),
-        ("datetime_combiner", 
-            "import os; "
-            "os.system('python3 /shared/scripts/datetime_combiner.py')")
-    ],
-    "colab": [
-        ("colab_a", 
-            "import os; "
-            "os.makedirs('/shared', exist_ok=True); "
-            "service_key = os.getenv('SERVICE_KEY', 'unknown'); "
-            "log_file = f'/shared/{service_key}.log'; "
-            "open(log_file, 'a').write('colab_a says hi!\\n')"),
-        ("colab_b", 
-            "import os; "
-            "os.makedirs('/shared', exist_ok=True); "
-            "service_key = os.getenv('SERVICE_KEY', 'unknown'); "
-            "log_file = f'/shared/{service_key}.log'; "
-            "open(log_file, 'a').write('colab_b says hi too!\\n')")
-    ]
-}
-
-
-# set up docker images and cleanup
-def setup_docker_images():
-    """
-    Ensure 'auto_deployment' Docker image is available before starting containers.
-    """
-    client = docker.from_env()
-    image_name = "auto_deployment"
-
-    try:
-        print(f"[INFO] Checking if image '{image_name}' is available locally...")
-        if not client.images.list(name=image_name):
-            print(f"[ERROR] Image '{image_name}' is missing! Please build it using:")
-            print("       docker build -t auto_deployment .")
-            exit(1)  # Stop execution if the image is missing
-        else:
-            print(f"[INFO] Image '{image_name}' is available locally.")
-    except docker.errors.DockerException as e:
-        print(f"[ERROR] Docker is not running or failed to check images: {e}")
-        exit(1)
-
-def cleanup_containers():
-    """
-    Stop and remove Docker containers
-    """
-    client = docker.from_env()
-    try:
-        containers = client.containers.list(all=True)
-        for container in containers:
-            print(f"[INFO] Stopping and removing container: {container.name}")
-            try:
-                container.stop()
-                container.remove()
-            except docker.errors.NotFound:
-                print(f"[WARNING] Container {container.name} not found. It may have already been removed.")
-    except docker.errors.DockerException as e:
-        print(f"[ERROR] Failed to cleanup containers: {e}")
-
-# services deploy and stop
-def deploy_service(mgr, service_name):
-    """
-    Deploys a service, choosing hosts automatically.
-    """
-    global should_deploy_colab
-
-    if service_name not in service_definitions:
-        print(f"[ERROR] Service '{service_name}' not supported.")
-        return
-
-    required_hosts = len(service_definitions[service_name])
-    available_hosts = get_available_hosts(mgr)
-
-    # Ensure there are enough hosts by removing "colab" services if necessary
-    if len(available_hosts) < required_hosts:
-        colab_services_to_remove = []
-        for service_key, service_info in service_instances.items():
-            if "colab" in service_key:
-                colab_services_to_remove.append(service_key)
-                if len(colab_services_to_remove) * 2 >= required_hosts:
-                    break
-
-        for service_key in colab_services_to_remove:
-            service_info = service_instances[service_key]
-            for service in service_info["processes"]:
-                mgr.removeContainer(service)
-                print(f"[INFO] Removed colab service: {service}")
-
-            del service_instances[service_key]
-            available_hosts = get_available_hosts(mgr)
-            if len(available_hosts) >= required_hosts:
-                break
-
-    if len(available_hosts) < required_hosts:
-        print("[ERROR] Not enough available hosts even after removing colab services!")
-        return
-
-    selected_hosts = random.sample(available_hosts, required_hosts)
-    service_counters[service_name] += 1
-    service_key = f"{service_name}_{service_counters[service_name]}"
-    service_instances[service_key] = {
-        "processes": [],
-        "flows": []
-    }
-
-    scripts_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'scripts'))
-    
-    for (app_name, command), host in zip(service_definitions[service_name], selected_hosts):
-        if len(mgr.getContainersDhost(host)) == 2:
-            print(f"[ERROR] Host {host} already has 2 containers.")
-            continue
-        if host not in container_counter:
-            container_counter[host] = {}
-        if app_name not in container_counter[host]:
-            container_counter[host][app_name] = 0
-        container_counter[host][app_name] += 1
-        container_name = f"{app_name}_{host}_{container_counter[host][app_name]}"
-        try:
-            if app_name == "database":
-                # db_ip = mgr.net.get(host).IP()
-                db_ip = container_name
-                print(f"[INFO] Database IP: {db_ip}")
-                process_cmd = ["python3", "/shared/scripts/database.py"]
-            elif app_name == "webserver":
-                process_cmd = ["python3", "/shared/scripts/web_server.py", f"http://{db_ip}:81"]
-            else:
-                process_cmd = ["python3", "-c", command.replace('localhost', mgr.net.get(host).IP())]
-            env_vars = {
-                "SERVICE_KEY": service_key,
-                "HOSTNAME": "0.0.0.0", # mgr.net.get(host).IP(),
-                "NAME": container_name
-            }
-            mgr.addContainer(container_name, host, "auto_deployment", process_cmd, docker_args={
-                "command": process_cmd, 
-                "volumes": {
-                    "/shared": {"bind": "/shared", "mode": "rw"},
-                    scripts_path : {"bind": "/shared/scripts", "mode": "ro"} 
-                },
-                "environment": env_vars,
-                "network": "bridge",
-            })
-            service_instances[service_key]["processes"].append(container_name)
-            print(f"[INFO] Service {app_name} started on {host}")
-        except Exception as e:
-            print(f"[ERROR] Failed to start service {app_name} on {host}: {e}")
-
-    setup_service_flows(mgr.net, service_definitions[service_name], selected_hosts, service_key)
-    
-    total_containers = sum(len(mgr.getContainersDhost(host.name)) for host in mgr.net.hosts)
-    max_containers = len(mgr.net.hosts) * 2
-    if total_containers < max_containers:
-        should_deploy_colab = True
-
-    # Call deploy_colab_service if needed after deploying the service
-    if should_deploy_colab:
-        deploy_colab_service(mgr)
-
-def deploy_colab_service(mgr):
-    """
-    Deploys or redeploys colab services on available hosts dynamically.
-    Colab services should use all available resources but give priority to user deployable services.
-    """
-    global should_deploy_colab
-
-    while should_deploy_colab:
-        available_hosts = get_available_hosts(mgr)
-
-        if len(available_hosts) < 1:
-            print("[INFO] No available spaces to deploy colab services.")
-            return
-        elif len(available_hosts) == 1 and len(mgr.getContainersDhost(available_hosts[0])) == 0:
-            # If only one host is available but has two free slots, deploy both services there.
-            selected_hosts = [available_hosts[0], available_hosts[0]]
-        elif len(available_hosts) >= 2:
-            # If at least two hosts are available, deploy on different hosts.
-            selected_hosts = random.sample(available_hosts, 2)
-        else:
-            # If only one slot is available, wait until more slots are available.
-            print("[INFO] Not enough space to deploy a full colab service. Waiting...")
-            return
-
-        service_counters["colab"] += 1
-        service_key = f"colab_{service_counters['colab']}"
-        service_instances[service_key] = {
-            "processes": [],
-            "flows": []
+class ServiceManager:
+    def __init__(self, controller=None):
+        self.service_instances = {}  # (service_key, app_name): {host, process, ip, listen_port}
+        self.host_app_counts = {}
+        self.host_max_apps = 2
+        self.flow_manager = FlowManager()
+        self.active_flows = {}
+        self.service_counters = {k: 0 for k in ["web", "random", "datetime", "colab"]}
+        self.service_definitions = {
+            "web": [
+                ("database", "python3 /shared/scripts/database.py", {"LISTEN_PORT": "81"}),
+                ("web_server", "python3 /shared/scripts/web_server.py", {"DB_IP": None, "LISTEN_PORT": "80"})
+            ],
+            "random": [
+                ("random_gen1", "python3 /shared/scripts/random_gen1.py", {"LISTEN_PORT": "5000"}),
+                ("random_gen2", "python3 /shared/scripts/random_gen2.py", {"LISTEN_PORT": "5001"}),
+                ("random_sum", "python3 /shared/scripts/random_sum.py", {"GEN1_IP": None, "GEN2_IP": None, "LISTEN_PORT": "8080"})
+            ],
+            "datetime": [
+                ("date_fetcher", "python3 /shared/scripts/date_fetcher.py", {"LISTEN_PORT": "5002"}),
+                ("time_fetcher", "python3 /shared/scripts/time_fetcher.py", {"LISTEN_PORT": "5003"}),
+                ("datetime_combiner", "python3 /shared/scripts/datetime_combiner.py", {"DATE_IP": None, "TIME_IP": None, "LISTEN_PORT": "8081"})
+            ],
+            "colab": [
+                ("colab_a", "python3 /shared/scripts/colab_a.py", {"COLAB_B_IP": None, "LISTEN_PORT": "8082"}),
+                ("colab_b", "python3 /shared/scripts/colab_b.py", {"LISTEN_PORT": "5004"})
+            ]
         }
+        self.controller = controller
+        self.flow_modification_queue = None  # or queue.Queue() if you use it directly
 
-        scripts_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'scripts'))
-        for (app_name, command), host in zip(service_definitions["colab"], selected_hosts):
-            if len(mgr.getContainersDhost(host)) == 2:
-                print(f"[INFO] Skipping {host}, already has 2 containers.")
-                continue  # Don't deploy if the host is full
+    def get_flow_queue(self):
+        return self.flow_modification_queue
 
-            if host not in container_counter:
-                container_counter[host] = {}
-            if app_name not in container_counter[host]:
-                container_counter[host][app_name] = 0
-            container_counter[host][app_name] += 1
-            container_name = f"{app_name}_{host}_{container_counter[host][app_name]}"
+    def _find_available_host(self, net, service_key, used_hosts=None):
+        # used_hosts: set of host names already used for this service_key
+        if used_hosts is None:
+            used_hosts = set()
+        candidates = [host for host in net.hosts
+                      if self.host_app_counts.get(host.name, 0) < self.host_max_apps
+                      and host.name not in used_hosts]
+        if candidates:
+            return random.choice(candidates)
+        return None
 
-            try:
-                process_cmd = ["python3", "-c", command.replace('localhost', container_name)]
-                mgr.addContainer(container_name, host, "auto_deployment", process_cmd, docker_args={
-                    "command": process_cmd, 
-                    "volumes": {
-                        "/shared": {"bind": "/shared", "mode": "rw"},
-                        scripts_path : {"bind": "/shared/scripts", "mode": "ro"} 
-                    },
-                    "environment": {"SERVICE_KEY": service_key},
-                    "network": "bridge",
-                })
-                service_instances[service_key]["processes"].append(container_name)
-                print(f"[INFO] Colab service {app_name} started on {host}")
-            except Exception as e:
-                print(f"[ERROR] Failed to start colab service {app_name} on {host}: {e}")
-
-        setup_service_flows(mgr.net, service_definitions["colab"], selected_hosts, service_key)
-    should_deploy_colab = False
-
-def stop_service(mgr, selected_process, service_instances):
-    """
-    Stops a specific service and removes associated flows.
-    """
-    stopped_services = []
-    removed_flows = []
-    global should_deploy_colab
-
-    service_key = None
-    for key, value in service_instances.items():
-        if selected_process in value["processes"]:
-            service_key = key
-            break
-
-    if not service_key:
-        print(f"[ERROR] Service for process '{selected_process}' not found in service_instances.")
-        return stopped_services, removed_flows
-
-    service_info = service_instances[service_key]
-
-    for service in service_info["processes"]:
-        mgr.removeContainer(service)
-        stopped_services.append(service)
-        print(f"[INFO] Stopped service: {service}")
-
-        # Extract host from service name (format: service_host)
+    def deploy_service_instance(self, net, service_key, app_name, command, env_vars, host=None, used_hosts=None):
+        if not host:
+            host = self._find_available_host(net, service_key, used_hosts)
+        if not host:
+            print(f"[ERROR] No available host for {service_key}-{app_name}")
+            return False
+        env = {line.split('=', 1)[0]: line.split('=', 1)[1] for line in host.cmd("env").strip().split('\n') if '=' in line}
+        env.update({k: v for k, v in env_vars.items() if v is not None})
+        env["SERVICE_KEY"] = service_key
+        cmd_args = command.split()
         try:
-            src_host = service.split('_')[2] 
-            src_ip = mgr.net.get(src_host).IP()
-            switch = get_switch_for_host(mgr.net, src_host)
-
-            # Remove associated flows
-            for flow in service_info["flows"]:
-                if src_ip in flow["src_ip"]:
-                    remove_flow(switch, flow["src_ip"], flow["dst_ip"])
-                    removed_flows.append((flow["src_ip"], flow["dst_ip"]))
-
-        except IndexError:
-            print("[ERROR] Service names must be in the format 'service_host'.")
-        except KeyError as e:
-            print(f"[ERROR] Invalid source host: {e}")
-        except AttributeError as e:
-            print(f"[ERROR] Failed to get switch for host: {e}")
-
-    del service_instances[service_key]
-    print(f"[INFO] Successfully stopped '{service_key}' and removed associated flows.")
-        
-    # Ensure colab services can be redeployed if needed
-    total_containers = sum(len(mgr.getContainersDhost(host.name)) for host in mgr.net.hosts)
-    max_containers = len(mgr.net.hosts) * 2
-    if total_containers < max_containers:
-        should_deploy_colab = True
-        
-    return stopped_services, removed_flows
-
-def setup_service_flows(net, service_apps, hosts, service_key):
-    """
-    Configures SDN flows to enable communication between service components.
-    """
-    if len(hosts) < 2:
-        print("[ERROR] Not enough hosts to set up flows.")
-        return
-
-    for i in range(len(service_apps) - 1):
-        # Ensure we don't go out of bounds
-        if i + 1 >= len(hosts):  
-            break
-        
-        src_host = hosts[i]
-        dst_host = hosts[i + 1]
-        src_ip = net.get(src_host).IP()
-        dst_ip = net.get(dst_host).IP()
-        switch = get_switch_for_host(net, src_host)
-
-        if switch:
-            in_port = 1
-            out_port = 2
-            setup_flow(switch, src_ip, dst_ip, in_port, out_port)
-            service_instances[service_key]["flows"].append({
-                "src_ip": src_ip,
-                "dst_ip": dst_ip,
-                "switch": switch.name,
-                "in_port": in_port,
-                "out_port": out_port
-            })
-            print(f"[INFO] Flow configured between {src_host} and {dst_host}")
-
-def setup_flow(switch, src_ip, dst_ip, in_port, out_port):
-    """
-    Set up SDN flows.
-    """
-    try:
-        flow_rule = f"priority=100,ip,nw_src={src_ip},nw_dst={dst_ip},actions=output:{out_port}"
-        switch.dpctl('add-flow', flow_rule)
-        flows[(src_ip, dst_ip)] = (switch, in_port, out_port)
-        print(f"[INFO] Flow added: {src_ip} -> {dst_ip}")
-    except Exception as e:
-        print(f"[ERROR] Failed to add flow: {src_ip} -> {dst_ip}. Error: {e}")
-
-def remove_flow(switch, src_ip, dst_ip):
-    """
-    Remove SDN flows.
-    """
-    flow_rule = f"priority=100,ip,nw_src={src_ip},nw_dst={dst_ip}"
-    switch.dpctl('del-flows', flow_rule)
-    if (src_ip, dst_ip) in flows:
-        del flows[(src_ip, dst_ip)]
-    print(f"[INFO] Flow removed: {src_ip} -> {dst_ip}")
-
-def get_switch_for_host(net, host):
-    """
-    Finds the switch connected to a given host.
-    """
-    for link in net.links:
-        if host in link.intf1.node.name:
-            return link.intf2.node
-        elif host in link.intf2.node.name:
-            return link.intf1.node
-    return None
-
-def update_gui_with_active_flows():
-    """
-    Updates the GUI with only the active flows and services.
-    """
-    results = {
-        "flows": {},
-        "services": {}
-    }
-
-    # Debugging: Print all active flows
-    print("[DEBUG] Active Flows:")
-    for service_key, service_info in service_instances.items():
-        for flow in service_info["flows"]:
-            results["flows"][(service_key, flow["src_ip"], flow["dst_ip"])] = {
-                "switch": flow["switch"],
-                "in_port": flow["in_port"],
-                "out_port": flow["out_port"]
+            proc = host.popen(cmd_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=os.setsid, env=env)
+            self.service_instances[(service_key, app_name)] = {
+                "host": host,
+                "process": proc,
+                "ip": host.IP(),
+                "listen_port": int(env_vars.get("LISTEN_PORT", 0))
             }
-            print(f"  - {service_key}: {flow['src_ip']} -> {flow['dst_ip']} (Switch: {flow['switch']})")
-
-    # Debugging: Print all active services
-    print("[DEBUG] Active Services:")
-    for service_key, service_info in service_instances.items():
-        results["services"][service_key] = service_info["processes"]
-        print(f"  - {service_key}: {service_info['processes']}")
-
-    return results
-
-def get_available_hosts(mgr):
-    """
-    Get a list of available hosts with less than 2 containers.
-    """
-    return [host.name for host in mgr.net.hosts if len(mgr.getContainersDhost(host.name)) < 2]
-
-
-# manager of services interacting with gui
-def control_services(mgr, action, service_name=None, selected_process=None, gui=None):
-    """
-    Controls the deployment, stopping, and redeployment of services based on GUI interactions.
-    action: Action to perform ('deploy', 'stop','redeploy_colab')
-    """
-    global should_deploy_colab
-
-    if action == 'deploy' and service_name:
-        deploy_service(mgr, service_name)
-    elif action == 'stop' and selected_process:
-        stopped_services, removed_flows = stop_service(mgr, selected_process, service_instances)
-        if should_deploy_colab:
-            deploy_colab_service(mgr)
-        if gui:
-            gui.update_active_services_listbox()
-            gui.update_communication_results()
-        return stopped_services, removed_flows
-    elif action == 'redeploy_colab':
-        deploy_colab_service(mgr)
-    else:
-        print("[ERROR] Invalid action or missing parameters.")
-        return [], []
-
-    if gui:
-        gui.update_active_services_listbox()
-        gui.update_communication_results()
-
-
-# test services
-def test_services(mgr):
-    """
-    Tests the deployed services by checking their functionality and summarizing the results for each service.
-    """
-    test_results = {}
-
-    for service_key, service_info in service_instances.items():
-        service_name = service_key.split('_')[0]
-
-        try:
-            if service_name == "colab":
-                log_file_path = f"/shared/{service_key}.log"
-                with open(log_file_path, "r") as f:
-                    result = f.read().strip()
-                if not result:
-                    result = "Colab log file is empty or not written correctly."
-                test_results[service_key] = result.strip()
-
-            elif service_name == "web":
-                web_server_process = next((p for p in service_info["processes"] if "webserver" in p), None)
-                db_server_process = next((p for p in service_info["processes"] if "database" in p), None)
-                
-                if web_server_process and db_server_process:
-                    web_ip = get_container_ip(web_server_process)
-                    db_ip = get_container_ip(db_server_process)
-                    n = random.randint(1, 3)
-                    web_url = f"http://{web_ip}:80"
-                    db_url = f"http://{db_ip}:81/{n}"  
-
-                    print(f"[DEBUG] Expected web_url: {web_url}")
-                    print(f"[DEBUG] Expected db_url: {db_url}")
-
-                    try:
-                        web_response = requests.get(web_url, timeout=10)
-                        db_response = requests.get(db_url, timeout=10)
-
-                        if web_response.status_code == 200 and db_response.status_code == 200:
-                            result = f"Web service running. DB Response: {db_response.text[:100]}"
-                        else:
-                            result = f"Web or DB service failed. Web: {web_response.status_code}, DB: {db_response.status_code}"
-                    except requests.ConnectionError as e:
-                        result = f"Error: Could not connect to one of the services. {e}"
-                    except requests.Timeout:
-                        result = "Error: Request to one of the services timed out."
-                else:
-                    result = "Web or Database service is missing"
-                test_results[service_key] = result.strip()
-            elif service_name == "random":
-                result_file_path = f"/shared/{service_key}.txt"
-                with open(result_file_path, "r") as f:
-                    result = f.read().strip()
-                if not result:
-                    result = "Random result file is empty or not written correctly."
-                test_results[service_key] = result.strip()
-
-            elif service_name == "datetime":
-                result_file_path = f"/shared/{service_key}.txt"
-                with open(result_file_path, "r") as f:
-                    result = f.read().strip()
-                if not result:
-                    result = "Datetime result file is empty or not written correctly."
-                test_results[service_key] = result.strip()
-
-            else:
-                test_results[service_key] = "Unknown service type"
-
-        except FileNotFoundError:
-            test_results[service_key] = f"{service_name} result file not found."
+            self.host_app_counts[host.name] = self.host_app_counts.get(host.name, 0) + 1
+            print(f"[INFO] {app_name} of {service_key} deployed on {host.name} ({host.IP()})")
+            return True
         except Exception as e:
-            test_results[service_key] = f"Error reading {service_name} result file: {e}"
+            print(f"[ERROR] Failed to deploy {app_name}: {e}")
+            return False
 
-    # Print the summarized results
-    print("\n--- Test Results Summary ---\n")
-    for service_key, result in test_results.items():
-        print(f"Service: {service_key}")
-        print(f"  - Result: {result}")
-        print("\n" + "-"*30 + "\n")
+    def stop_service_instance(self, service_key):
+        # Stop all apps for this service_key
+        for (s_k, a_n) in list(self.service_instances.keys()):
+            if s_k == service_key:
+                inst = self.service_instances[(s_k, a_n)]
+                proc = inst["process"]
+                host = inst["host"]
+                try:
+                    if proc and proc.poll() is None:
+                        os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
+                        time.sleep(0.5)
+                        if proc.poll() is None:
+                            os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+                        proc.wait(timeout=1)
+                except Exception as e:
+                    print(f"[ERROR] Error terminating {a_n}: {e}")
+                self.host_app_counts[host.name] = max(0, self.host_app_counts.get(host.name, 1) - 1)
+                del self.service_instances[(s_k, a_n)]
+        self._remove_flows_for_service(service_key)
+        return True
 
-    return test_results
+    def _remove_flows_for_service(self, service_key):
+        flows = self.flow_manager.get_active_flows()
+        for (s_k, src_ip, dst_ip, dst_port, proto, dpid, in_port), flow in list(flows.items()):
+            if s_k == service_key:
+                self.flow_manager.remove_flow_queue(self.flow_modification_queue, service_key, src_ip, dst_ip, proto, None, dst_port)
 
-def get_container_ip(container_name):
-    # Run the docker network inspect command to get the details in JSON format
-    result = subprocess.run(
-        ['docker', 'network', 'inspect', 'bridge'],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE
-    )
+    def _install_flows_for_service(self, net, service_key):
+        apps = {app: inst for (s_k, app), inst in self.service_instances.items() if s_k == service_key}
+        TCP = 6
+        ICMP = 1
+        hosts = [inst["host"] for inst in apps.values()]
+        # ICMP flows between all pairs (for ping)
+        for i in range(len(hosts)):
+            for j in range(i+1, len(hosts)):
+                self.flow_manager.add_flow_queue(
+                    self.flow_modification_queue, net, service_key,
+                    hosts[i], hosts[j], ICMP
+                )
+        # Service-specific TCP flows and env updates
+        if service_key.startswith("web"):
+            db, web = apps.get("database"), apps.get("web_server")
+            if db and web:
+                self.flow_manager.add_flow_queue(self.flow_modification_queue, net, service_key, web["host"], db["host"], TCP, None, db["listen_port"])
+                self._restart_app(web, self.service_definitions["web"][1][1], {"DB_IP": db["ip"], "SERVICE_KEY": service_key})
+        elif service_key.startswith("random"):
+            g1, g2, summ = apps.get("random_gen1"), apps.get("random_gen2"), apps.get("random_sum")
+            if g1 and g2 and summ:
+                self.flow_manager.add_flow_queue(self.flow_modification_queue, net, service_key, summ["host"], g1["host"], TCP, None, g1["listen_port"])
+                self.flow_manager.add_flow_queue(self.flow_modification_queue, net, service_key, summ["host"], g2["host"], TCP, None, g2["listen_port"])
+                self._restart_app(summ, self.service_definitions["random"][2][1], {"GEN1_IP": g1["ip"], "GEN2_IP": g2["ip"], "SERVICE_KEY": service_key})
+        elif service_key.startswith("datetime"):
+            date, timef, comb = apps.get("date_fetcher"), apps.get("time_fetcher"), apps.get("datetime_combiner")
+            if date and timef and comb:
+                self.flow_manager.add_flow_queue(self.flow_modification_queue, net, service_key, comb["host"], date["host"], TCP, None, date["listen_port"])
+                self.flow_manager.add_flow_queue(self.flow_modification_queue, net, service_key, comb["host"], timef["host"], TCP, None, timef["listen_port"])
+                self._restart_app(comb, self.service_definitions["datetime"][2][1], {"DATE_IP": date["ip"], "TIME_IP": timef["ip"], "SERVICE_KEY": service_key})
+        elif service_key.startswith("colab"):
+            a, b = apps.get("colab_a"), apps.get("colab_b")
+            if a and b:
+                self.flow_manager.add_flow_queue(self.flow_modification_queue, net, service_key, a["host"], b["host"], TCP, None, b["listen_port"])
+                self._restart_app(a, self.service_definitions["colab"][0][1], {"COLAB_B_IP": b["ip"], "SERVICE_KEY": service_key})
 
-    # Parse the JSON response
-    network_info = json.loads(result.stdout)
+    def _restart_app(self, inst, command, env_updates):
+        proc = inst["process"]
+        host = inst["host"]
+        try:
+            if proc and proc.poll() is None:
+                os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
+                time.sleep(0.5)
+                if proc.poll() is None:
+                    os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+                proc.wait(timeout=1)
+        except Exception:
+            pass
+        env = {line.split('=', 1)[0]: line.split('=', 1)[1] for line in host.cmd("env").strip().split('\n') if '=' in line}
+        env.update(env_updates)
+        cmd_args = command.split()
+        new_proc = host.popen(cmd_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=os.setsid, env=env)
+        inst["process"] = new_proc
 
-    # Find the container info by matching the container name
-    for container in network_info[0]['Containers']:
-        if container_name in network_info[0]['Containers'][container]['Name']:
-            # Return the IP address of the container
-            return network_info[0]['Containers'][container]['IPv4Address'].split('/')[0]
+    def control_services(self, net, action, service_name=None, selected_process=None, gui=None):
+        if action == "deploy":
+            if not service_name:
+                print("[ERROR] Service name required.")
+                return
+            app_defs = self.service_definitions.get(service_name)
+            needed_slots = len(app_defs)
+            available_slots = sum(self.host_max_apps - self.host_app_counts.get(h.name, 0) for h in net.hosts)
+            # If not enough space, stop as many colab instances as needed
+            if available_slots < needed_slots and service_name != "colab":
+                colab_keys = sorted({k[0] for k in self.service_instances if k[0].startswith("colab")})
+                stopped = 0
+                for colab_key in colab_keys:
+                    if available_slots >= needed_slots:
+                        break
+                    if self.stop_service_instance(colab_key):
+                        stopped += 1
+                        available_slots = sum(self.host_max_apps - self.host_app_counts.get(h.name, 0) for h in net.hosts)
+                if available_slots < needed_slots:
+                    print("[ERROR] Not enough space to deploy the service, even after stopping colab.")
+                    if gui:
+                        gui.test_results_text.config(state="normal")
+                        gui.test_results_text.insert("end", "Not enough space to deploy the service.\n")
+                        gui.test_results_text.config(state="disabled")
+                    return
+            self.service_counters[service_name] += 1
+            service_key = f"{service_name}-{self.service_counters[service_name]}"
+            used_hosts = set()
+            for idx, (app_name, command, env_vars) in enumerate(app_defs):
+                host = self._find_available_host(net, service_key, used_hosts)
+                # Fallback: if not enough hosts, allow reuse for this service instance
+                if not host and used_hosts:
+                    host = self._find_available_host(net, service_key)
+                if not self.deploy_service_instance(net, service_key, app_name, command, env_vars.copy(), host=host):
+                    print(f"[ERROR] Failed to deploy {app_name} for {service_key}. Rolling back.")
+                    self.stop_service_instance(service_key)
+                    return
+                if host:
+                    used_hosts.add(host.name)
+            self._install_flows_for_service(net, service_key)
+            self._update_controller_service_members() # Keep if you use it for other controller logic
+            self.active_flows = self.flow_manager.get_active_flows() # Update local active flows from FlowManager
+            print(f"[SUCCESS] Service '{service_key}' deployed.")
+            if gui:
+                gui.update_active_services()
+                gui.update_communication_results()
+        elif action == "stop":
+            if not selected_process:
+                print("[ERROR] No service instance selected to stop.")
+                return
+            parts = selected_process.split(', ')
+            service_key = parts[0].split(': ')[1]
+            if self.stop_service_instance(service_key):
+                self._update_controller_service_members() # Keep if you use it for other controller logic
+                self.try_redeploy_colab(net)
+                print(f"[SUCCESS] Stopped {service_key}")
+            if gui:
+                gui.update_active_services()
+                gui.update_communication_results()
 
-    # Return None if not found
-    return None
+    def deploy_colab_on_all_hosts(self, net):
+        service_name = "colab"
+        app_defs = self.service_definitions[service_name]
+        used_hosts = set()
+        for _ in net.hosts:
+            service_key = f"colab-{len(self.service_instances)//len(app_defs)+1}"
+            for app_name, command, env_vars in app_defs:
+                host = self._find_available_host(net, service_key, used_hosts)
+                # If no unused host, allow reuse for this service instance
+                if not host and used_hosts:
+                    host = self._find_available_host(net, service_key)
+                if not self.deploy_service_instance(net, service_key, app_name, command, env_vars.copy(), host=host):
+                    print(f"[ERROR] Failed to deploy {app_name} for {service_key}. Rolling back.")
+                    self.stop_service_instance(service_key)
+                    break
+                if host:
+                    used_hosts.add(host.name)
+            self._install_flows_for_service(net, service_key)
+        self._update_controller_service_members()
 
-def clean_shared_folder():
-    """
-    Clean up the /shared folder by deleting all files except the scripts directory.
-    """
-    shared_folder = "/shared"
-    if os.path.exists(shared_folder):
-        for filename in os.listdir(shared_folder):
-            file_path = os.path.join(shared_folder, filename)
-            try:
-                if os.path.isfile(file_path) or os.path.islink(file_path):
-                    os.unlink(file_path)
-                elif os.path.isdir(file_path) and filename != "scripts":
-                    os.rmdir(file_path)
-            except Exception as e:
-                print(f"[ERROR] Failed to delete {file_path}. Reason: {e}")
+    def try_redeploy_colab(self, net):
+        service_name = "colab"
+        app_defs = self.service_definitions[service_name]
+        used_hosts = set(h.name for (k, _), inst in self.service_instances.items() if k.startswith("colab"))
+        for _ in net.hosts:
+            # Find a service_key not already used
+            idx = 1
+            while f"colab-{idx}" in (k for (k, _) in self.service_instances):
+                idx += 1
+            service_key = f"colab-{idx}"
+            # Find available host, prefer unused
+            host = self._find_available_host(net, service_key, used_hosts)
+            if not host and used_hosts:
+                host = self._find_available_host(net, service_key)
+            # Only deploy if host has enough space for both apps
+            if host and self.host_app_counts.get(host.name, 0) <= self.host_max_apps - len(app_defs):
+                for app_name, command, env_vars in app_defs:
+                    self.deploy_service_instance(net, service_key, app_name, command, env_vars.copy(), host=host)
+                self._install_flows_for_service(net, service_key)
+                used_hosts.add(host.name)
+        self._update_controller_service_members()
+
+    def wait_for_file_content(self, host, filepath, timeout=20, interval=0.5):
+        waited = 0
+        while waited < timeout:
+            check = host.cmd(f"test -s {filepath} && echo 'exists'").strip()
+            print(f"[DEBUG] wait_for_file_content: waited={waited}, test output='{check}'")
+            if check == "exists":
+                content = host.cmd(f"cat {filepath}").strip()
+                print(f"[DEBUG] wait_for_file_content: read content='{content}'")
+                # Escludi "exists" come contenuto valido
+                if content and content != "exists":
+                    return content
+            time.sleep(interval)
+            waited += interval
+        return None
+    def test_service(self, net, service_key_to_test):
+        test_results = {}
+        client_map = {"web": "web_server", "random": "random_sum", "datetime": "datetime_combiner", "colab": "colab_a"}
+        for prefix, client_app in client_map.items():
+            if service_key_to_test.startswith(prefix):
+                break
+        else:
+            test_results[service_key_to_test] = "Error: No client application defined."
+            return test_results
+        inst = next((info for (s_k, a_n), info in self.service_instances.items() if s_k == service_key_to_test and a_n == client_app), None)
+        if inst:
+            host = inst["host"]
+            output_file = f"/shared/{service_key_to_test}.txt"
+            content = self.wait_for_file_content(host, output_file)
+            if content:
+                test_results[service_key_to_test] = content
+            else:
+                test_results[service_key_to_test] = f"Error: Output file {output_file} missing or empty after waiting."
+        else:
+            test_results[service_key_to_test] = f"Error: Client app {client_app} not found."
+        return test_results
+
+    def clean_shared_folder(self):
+        shared_folder = "/shared"
+        if os.path.exists(shared_folder):
+            for filename in os.listdir(shared_folder):
+                file_path = os.path.join(shared_folder, filename)
+                try:
+                    if os.path.isfile(file_path) or os.path.islink(file_path):
+                        os.unlink(file_path)
+                except Exception as e:
+                    print(f"[ERROR] Failed to delete {file_path}: {e}")
+            print(f"[INFO] Cleaned up /shared folder.")
+
+    def update_gui_with_active_services(self):
+        return [f"Service: {s_k}, App: {a_n}, Host: {inst['host'].name}, IP: {inst['ip']}" for (s_k, a_n), inst in self.service_instances.items()]
+
+    def update_gui_with_active_flows(self):
+        self.active_flows = self.flow_manager.get_active_flows()
+        return {"flows": self.active_flows}
+
+
+    def _remove_flows_for_service(self, service_key):
+        # The FlowManager now handles the direct API calls for removal
+        flows = self.flow_manager.get_active_flows()
+        flows_to_remove = []
+        for (s_k, src_ip, dst_ip, dst_port, proto, dpid, in_port), flow in list(flows.items()):
+            if s_k == service_key:
+                flows_to_remove.append(flow) # Collect flows associated with the service_key
+                
+        # Call remove_flow_queue (which now calls _send_flow_to_ryu for removal) for each.
+        # Note: You might want to pass more specific info to remove_flow_queue if you want to delete
+        # by specific match fields rather than just the service_key.
+        # The current remove_flow_queue in FlowManager will iterate and delete.
+        for flow_data in flows_to_remove:
+            self.flow_manager.remove_flow_queue(
+                None, # No queue needed here
+                service_key,
+                flow_data['src_ip'],
+                flow_data['dst_ip'],
+                flow_data['protocol'],
+                flow_data['src_port'],
+                flow_data['dst_port']
+            )
+
+    def _install_flows_for_service(self, net, service_key):
+        apps = {app: inst for (s_k, app), inst in self.service_instances.items() if s_k == service_key}
+        TCP = 6
+        ICMP = 1
+        hosts = [inst["host"] for inst in apps.values()]
+        
+        # ICMP flows between all pairs (for ping)
+        for i in range(len(hosts)):
+            for j in range(i+1, len(hosts)):
+                self.flow_manager.add_flow_queue( # No queue passed, FlowManager sends directly
+                    None, # Queue argument becomes None as it's not used for direct API calls
+                    net, service_key,
+                    hosts[i], hosts[j], ICMP
+                )
+        # Service-specific TCP flows and env updates
+        if service_key.startswith("web"):
+            db, web = apps.get("database"), apps.get("web_server")
+            if db and web:
+                self.flow_manager.add_flow_queue(None, net, service_key, web["host"], db["host"], TCP, None, db["listen_port"])
+                self._restart_app(web, self.service_definitions["web"][1][1], {"DB_IP": db["ip"], "SERVICE_KEY": service_key})
+        elif service_key.startswith("random"):
+            g1, g2, summ = apps.get("random_gen1"), apps.get("random_gen2"), apps.get("random_sum")
+            if g1 and g2 and summ:
+                self.flow_manager.add_flow_queue(None, net, service_key, summ["host"], g1["host"], TCP, None, g1["listen_port"])
+                self.flow_manager.add_flow_queue(None, net, service_key, summ["host"], g2["host"], TCP, None, g2["listen_port"])
+                self._restart_app(summ, self.service_definitions["random"][2][1], {"GEN1_IP": g1["ip"], "GEN2_IP": g2["ip"], "SERVICE_KEY": service_key})
+        elif service_key.startswith("datetime"):
+            date, timef, comb = apps.get("date_fetcher"), apps.get("time_fetcher"), apps.get("datetime_combiner")
+            if date and timef and comb:
+                self.flow_manager.add_flow_queue(None, net, service_key, comb["host"], date["host"], TCP, None, date["listen_port"])
+                self.flow_manager.add_flow_queue(None, net, service_key, comb["host"], timef["host"], TCP, None, timef["listen_port"])
+                self._restart_app(comb, self.service_definitions["datetime"][2][1], {"DATE_IP": date["ip"], "TIME_IP": timef["ip"], "SERVICE_KEY": service_key})
+        elif service_key.startswith("colab"):
+            a, b = apps.get("colab_a"), apps.get("colab_b")
+            if a and b:
+                self.flow_manager.add_flow_queue(None, net, service_key, a["host"], b["host"], TCP, None, b["listen_port"])
+                self._restart_app(a, self.service_definitions["colab"][0][1], {"COLAB_B_IP": b["ip"], "SERVICE_KEY": service_key})
+                              
+    def _update_controller_service_members(self):
+        # This method is less critical for *flow installation* now,
+        # but if your controller or GUI still relies on this mapping for other reasons, keep it.
+        # The controller won't be reactively installing flows based on this.
+        mapping = {}
+        for (service_key, _), inst in self.service_instances.items():
+            mapping.setdefault(service_key, []).append(inst["ip"])
+        if self.controller:
+            # If your Ryu controller still has update_service_members for logging or other (non-flow) logic,
+            # you can keep this call. Otherwise, it can be removed.
+            # For this proactive approach, the controller itself doesn't need to know service members for flow decisions.
+            self.controller.update_service_members(mapping)
+

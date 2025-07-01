@@ -1,45 +1,52 @@
-import http.server
-import socketserver
-import os
 import requests
 import sys
-import logging 
-PORT = 80
-host = os.getenv('HOSTNAME', '0.0.0.0')
+import time
+import os
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
+# Define the port for the database service
+DB_PORT = 81
+# Get the IP address of the database server from environment variable
+# This will be set by the ServiceManager when deploying the service
+DB_IP = os.getenv('DB_IP')
+# Get the service key to identify the output file
+SERVICE_KEY = os.getenv('SERVICE_KEY', 'unknown')
 
-class Handler(http.server.SimpleHTTPRequestHandler):
-    def do_GET(self):
-        item_id = self.path.strip("/")
-        if not item_id:  # Root request
-            self.send_response(200)
-            self.send_header('Content-type', 'text/html')
-            self.end_headers()
-            self.wfile.write(b'<html><body><h1>Web Server is running</h1></body></html>')
-            return
+# Ensure the /shared directory exists for output
+os.makedirs('/shared', exist_ok=True)
 
-        # Fetch data from the database server
-        try:
-            response = requests.get(f"{database_url}/{item_id}")
-            item = response.text
-        except requests.ConnectionError:
-            item = "Database unavailable"
-
-        self.send_response(200)
-        self.send_header('Content-type', 'text/plain')
-        self.end_headers()
-        self.wfile.write(item.encode())
+def fetch_data_from_db(db_ip, item_id):
+    """
+    Fetches data from the database server.
+    """
+    url = f"http://{db_ip}:{DB_PORT}/{item_id}"
+    try:
+        # Make an HTTP GET request to the database server
+        response = requests.get(url, timeout=5)
+        response.raise_for_status() # Raise HTTPError for bad responses (4xx or 5xx)
+        return response.text
+    except requests.exceptions.RequestException as e:
+        return f"Error fetching from DB ({db_ip}): {e}"
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python3 web_server.py <database_url>")
+    # Ensure standard output is flushed immediately
+    sys.stdout.flush() 
+    print(f"Web server started. Attempting to connect to DB at {DB_IP}:{DB_PORT}")
+
+    if not DB_IP:
+        print("[ERROR] DB_IP environment variable not set. Exiting.")
         sys.exit(1)
 
-    database_url = sys.argv[1]
+    result_data = []
+    # Attempt to fetch data multiple times to demonstrate connectivity
+    for i in range(1, 4):
+        # Give the database server some time to start up
+        time.sleep(2) 
+        data = fetch_data_from_db(DB_IP, str(i))
+        print(f"Fetched data (item {i}): {data}")
+        result_data.append(f"Item {i}: {data}")
 
-    with socketserver.TCPServer((host, PORT), Handler) as httpd:
-        logging.info(f"Serving on port {PORT}, host {host}")
-        logging.info(f"Using database URL: {database_url}")
-        httpd.serve_forever()
+    # Write results to a file in the shared directory
+    output_path = f'/shared/{SERVICE_KEY}.txt'
+    with open(output_path, 'w') as f:
+        f.write("\n".join(result_data))
+    print(f"Web server results written to {output_path}")
