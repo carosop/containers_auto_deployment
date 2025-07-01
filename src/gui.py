@@ -25,7 +25,7 @@ class ServiceDeployGUI:
             self.test_service_combobox.set(active_service_keys[0])
     def setup_gui(self):
         self.root.title("SDN Service Deployment & Monitoring")
-        self.root.minsize(1200, 800)  
+        self.root.minsize(1200, 600)  
         for i in range(2):
             self.root.grid_rowconfigure(i, weight=1)
             self.root.grid_columnconfigure(i, weight=1)
@@ -124,7 +124,7 @@ class ServiceDeployGUI:
         self.test_results_text.delete(1.0, tk.END)
         self.test_results_text.insert(tk.END, f"Running test for {service_to_test}...\n")
         self.root.update_idletasks()
-        test_results = self.service_manager.test_service(self.net, service_to_test)
+        test_results = self.service_manager.test_service(service_to_test)
         self.test_results_text.delete(1.0, tk.END)
         if test_results:
             for service_key, result in test_results.items():

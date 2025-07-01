@@ -36,49 +36,76 @@ class MyTopo:
         for i in range(num_switches):
             net.addLink(switches[i], switches[(i + 1) % num_switches], cls=TCLink, bw=100, delay="5ms")
 
+# class ComplexTopo:
+#     """
+#     Defines a more complex SDN topology with multiple switches and standard hosts.
+#     This example uses a spine-leaf architecture.
+#     """
+#     def build(self, net, num_hosts, num_switches):
+#         # Ensure at least 2 switches for spine-leaf (one spine, one leaf)
+#         if num_switches < 2:
+#             num_switches = 2
+#             print("[WARNING] Complex topology requires at least 2 switches. Setting num_switches to 2.")
+
+#         spine_switches = []
+#         leaf_switches = []
+
+#         # Assuming num_switches is split into spine and leaf (e.g., half each)
+#         num_spine = max(1, num_switches // 2)
+#         num_leaf = max(1, num_switches - num_spine)
+
+#         # Spine Switches
+#         for i in range(1, num_spine + 1):
+#             switch = net.addSwitch(f"s_spine{i}")
+#             spine_switches.append(switch)
+
+#         # Leaf Switches
+#         for i in range(1, num_leaf + 1):
+#             switch = net.addSwitch(f"s_leaf{i}")
+#             leaf_switches.append(switch)
+
+#         # Standard Mininet hosts
+#         hosts = []
+#         for i in range(1, num_hosts + 1):
+#             host = net.addHost(f"h{i}")
+#             hosts.append(host)
+
+#         # Connect hosts to leaf switches
+#         for i, host in enumerate(hosts):
+#             # Distribute hosts among leaf switches
+#             net.addLink(host, leaf_switches[i % num_leaf], cls=TCLink, bw=50, delay="10ms")
+
+#         # Connect leaf switches to spine switches (full mesh between spine and leaf)
+#         for leaf_s in leaf_switches:
+#             for spine_s in spine_switches:
+#                 net.addLink(leaf_s, spine_s, cls=TCLink, bw=100, delay="5ms")
+
 class ComplexTopo:
     """
     Defines a more complex SDN topology with multiple switches and standard hosts.
     This example uses a spine-leaf architecture.
     """
     def build(self, net, num_hosts, num_switches):
-        # Ensure at least 2 switches for spine-leaf (one spine, one leaf)
         if num_switches < 2:
             num_switches = 2
             print("[WARNING] Complex topology requires at least 2 switches. Setting num_switches to 2.")
 
-        spine_switches = []
-        leaf_switches = []
-
-        # Assuming num_switches is split into spine and leaf (e.g., half each)
         num_spine = max(1, num_switches // 2)
         num_leaf = max(1, num_switches - num_spine)
 
-        # Spine Switches
-        for i in range(1, num_spine + 1):
-            switch = net.addSwitch(f"s_spine{i}")
-            spine_switches.append(switch)
+        # Add spine and leaf switches
+        spine_switches = [net.addSwitch(f"s_spine{i+1}") for i in range(num_spine)]
+        leaf_switches = [net.addSwitch(f"s_leaf{i+1}") for i in range(num_leaf)]
 
-        # Leaf Switches
-        for i in range(1, num_leaf + 1):
-            switch = net.addSwitch(f"s_leaf{i}")
-            leaf_switches.append(switch)
-
-        # Standard Mininet hosts
-        hosts = []
-        for i in range(1, num_hosts + 1):
-            host = net.addHost(f"h{i}")
-            hosts.append(host)
-
-        # Connect hosts to leaf switches
-        for i, host in enumerate(hosts):
-            # Distribute hosts among leaf switches
+        # Add hosts and connect each to a leaf switch (round-robin)
+        for i in range(num_hosts):
+            host = net.addHost(f"h{i+1}")
             net.addLink(host, leaf_switches[i % num_leaf], cls=TCLink, bw=50, delay="10ms")
 
-        # Connect leaf switches to spine switches (full mesh between spine and leaf)
-        for leaf_s in leaf_switches:
-            for spine_s in spine_switches:
-                net.addLink(leaf_s, spine_s, cls=TCLink, bw=100, delay="5ms")
+        # Connect each leaf switch to all spine switches (full mesh)
+        for leaf in leaf_switches:
+            for spine in spine_switches:
+                net.addLink(leaf, spine, cls=TCLink, bw=100, delay="5ms")
 
 def build_topology(topology_type, net):
     """
@@ -132,6 +159,9 @@ class NetworkManager:
             self._configure_hosts()
             info("[INFO] Starting GUI...\n")
             self.start_gui()
+            
+            # while threading.active_count() > 1:
+            #     time.sleep(1)
 
             info("[INFO] Starting Mininet CLI...\n")
             CLI(self.net)

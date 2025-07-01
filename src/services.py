@@ -100,7 +100,7 @@ class ServiceManager:
         flows = self.flow_manager.get_active_flows()
         for (s_k, src_ip, dst_ip, dst_port, proto, dpid, in_port), flow in list(flows.items()):
             if s_k == service_key:
-                self.flow_manager.remove_flow_queue(self.flow_modification_queue, service_key, src_ip, dst_ip, proto, None, dst_port)
+                self.flow_manager.remove_flow_queue(service_key, src_ip, dst_ip, proto, None, dst_port)
 
     def _install_flows_for_service(self, net, service_key):
         apps = {app: inst for (s_k, app), inst in self.service_instances.items() if s_k == service_key}
@@ -110,32 +110,29 @@ class ServiceManager:
         # ICMP flows between all pairs (for ping)
         for i in range(len(hosts)):
             for j in range(i+1, len(hosts)):
-                self.flow_manager.add_flow_queue(
-                    self.flow_modification_queue, net, service_key,
-                    hosts[i], hosts[j], ICMP
-                )
+                self.flow_manager.add_flow_queue(net, service_key,hosts[i], hosts[j], ICMP)
         # Service-specific TCP flows and env updates
         if service_key.startswith("web"):
             db, web = apps.get("database"), apps.get("web_server")
             if db and web:
-                self.flow_manager.add_flow_queue(self.flow_modification_queue, net, service_key, web["host"], db["host"], TCP, None, db["listen_port"])
+                self.flow_manager.add_flow_queue(net, service_key, web["host"], db["host"], TCP, None, db["listen_port"])
                 self._restart_app(web, self.service_definitions["web"][1][1], {"DB_IP": db["ip"], "SERVICE_KEY": service_key})
         elif service_key.startswith("random"):
             g1, g2, summ = apps.get("random_gen1"), apps.get("random_gen2"), apps.get("random_sum")
             if g1 and g2 and summ:
-                self.flow_manager.add_flow_queue(self.flow_modification_queue, net, service_key, summ["host"], g1["host"], TCP, None, g1["listen_port"])
-                self.flow_manager.add_flow_queue(self.flow_modification_queue, net, service_key, summ["host"], g2["host"], TCP, None, g2["listen_port"])
+                self.flow_manager.add_flow_queue(net, service_key, summ["host"], g1["host"], TCP, None, g1["listen_port"])
+                self.flow_manager.add_flow_queue(net, service_key, summ["host"], g2["host"], TCP, None, g2["listen_port"])
                 self._restart_app(summ, self.service_definitions["random"][2][1], {"GEN1_IP": g1["ip"], "GEN2_IP": g2["ip"], "SERVICE_KEY": service_key})
         elif service_key.startswith("datetime"):
             date, timef, comb = apps.get("date_fetcher"), apps.get("time_fetcher"), apps.get("datetime_combiner")
             if date and timef and comb:
-                self.flow_manager.add_flow_queue(self.flow_modification_queue, net, service_key, comb["host"], date["host"], TCP, None, date["listen_port"])
-                self.flow_manager.add_flow_queue(self.flow_modification_queue, net, service_key, comb["host"], timef["host"], TCP, None, timef["listen_port"])
+                self.flow_manager.add_flow_queue(net, service_key, comb["host"], date["host"], TCP, None, date["listen_port"])
+                self.flow_manager.add_flow_queue(net, service_key, comb["host"], timef["host"], TCP, None, timef["listen_port"])
                 self._restart_app(comb, self.service_definitions["datetime"][2][1], {"DATE_IP": date["ip"], "TIME_IP": timef["ip"], "SERVICE_KEY": service_key})
         elif service_key.startswith("colab"):
             a, b = apps.get("colab_a"), apps.get("colab_b")
             if a and b:
-                self.flow_manager.add_flow_queue(self.flow_modification_queue, net, service_key, a["host"], b["host"], TCP, None, b["listen_port"])
+                self.flow_manager.add_flow_queue(net, service_key, a["host"], b["host"], TCP, None, b["listen_port"])
                 self._restart_app(a, self.service_definitions["colab"][0][1], {"COLAB_B_IP": b["ip"], "SERVICE_KEY": service_key})
 
     def _restart_app(self, inst, command, env_updates):
@@ -210,7 +207,9 @@ class ServiceManager:
             service_key = parts[0].split(': ')[1]
             if self.stop_service_instance(service_key):
                 self._update_controller_service_members() # Keep if you use it for other controller logic
+                print("[DEBUG] Calling try_redeploy_colab after stopping service")
                 self.try_redeploy_colab(net)
+                print("[DEBUG] Finished try_redeploy_colab")
                 print(f"[SUCCESS] Stopped {service_key}")
             if gui:
                 gui.update_active_services()
@@ -237,42 +236,121 @@ class ServiceManager:
         self._update_controller_service_members()
 
     def try_redeploy_colab(self, net):
+        print("[DEBUG] try_redeploy_colab started")
         service_name = "colab"
         app_defs = self.service_definitions[service_name]
-        used_hosts = set(h.name for (k, _), inst in self.service_instances.items() if k.startswith("colab"))
-        for _ in net.hosts:
-            # Find a service_key not already used
-            idx = 1
-            while f"colab-{idx}" in (k for (k, _) in self.service_instances):
+
+        used_hosts = set(inst["host"].name for (k, _), inst in self.service_instances.items() if k.startswith("colab"))
+        print(f"[DEBUG] Used hosts for colab: {used_hosts}")
+
+        existing_keys = set(k for (k, _) in self.service_instances if k.startswith("colab"))
+        idx = 1
+
+        # Copia temporanea del conteggio slot per simulare allocazioni durante il loop
+        temp_host_app_counts = self.host_app_counts.copy()
+
+        while True:
+            while f"colab-{idx}" in existing_keys:
                 idx += 1
             service_key = f"colab-{idx}"
-            # Find available host, prefer unused
-            host = self._find_available_host(net, service_key, used_hosts)
-            if not host and used_hosts:
-                host = self._find_available_host(net, service_key)
-            # Only deploy if host has enough space for both apps
-            if host and self.host_app_counts.get(host.name, 0) <= self.host_max_apps - len(app_defs):
-                for app_name, command, env_vars in app_defs:
-                    self.deploy_service_instance(net, service_key, app_name, command, env_vars.copy(), host=host)
+
+            hosts_for_apps = []
+            used_hosts_for_this_colab = set()
+
+            for app_name, command, env_vars in app_defs:
+                # Trova host con almeno 1 slot libero basandosi su temp_host_app_counts
+                candidate_hosts = [h for h in net.hosts if temp_host_app_counts.get(h.name,0) < self.host_max_apps and h.name not in used_hosts_for_this_colab]
+                
+                if not candidate_hosts:
+                    # prova anche senza escludere usati per altre app di questo colab
+                    candidate_hosts = [h for h in net.hosts if temp_host_app_counts.get(h.name,0) < self.host_max_apps]
+                
+                if not candidate_hosts:
+                    print("[DEBUG] No more hosts available for this app, stopping deployment of this colab instance.")
+                    break
+                
+                # Scegli uno random tra i candidati
+                host = random.choice(candidate_hosts)
+                
+                hosts_for_apps.append((app_name, command, env_vars, host))
+                used_hosts_for_this_colab.add(host.name)
+                
+                # Aggiorna il conteggio temporaneo
+                temp_host_app_counts[host.name] = temp_host_app_counts.get(host.name,0) + 1
+
+            if len(hosts_for_apps) < len(app_defs):
+                break
+
+            success = True
+            for app_name, command, env_vars, host in hosts_for_apps:
+                if not self.deploy_service_instance(net, service_key, app_name, command, env_vars.copy(), host=host):
+                    print(f"[ERROR] Failed to deploy {app_name} on {host.name} for {service_key}")
+                    success = False
+                    break
+
+            if success:
                 self._install_flows_for_service(net, service_key)
-                used_hosts.add(host.name)
+                existing_keys.add(service_key)
+                idx += 1
+            else:
+                break
+
         self._update_controller_service_members()
 
+    # def try_redeploy_colab(self, net):
+    #     print("[DEBUG] try_redeploy_colab started")
+    #     service_name = "colab"
+    #     app_defs = self.service_definitions[service_name]
+    #     used_hosts = set(inst["host"].name for (k, _), inst in self.service_instances.items() if k.startswith("colab"))
+    #     for _ in net.hosts:
+    #         # Find a service_key not already used
+    #         idx = 1
+    #         while f"colab-{idx}" in (k for (k, _) in self.service_instances):
+    #             idx += 1
+    #         service_key = f"colab-{idx}"
+    #         # Find available host, prefer unused
+    #         host = self._find_available_host(net, service_key, used_hosts)
+    #         if not host and used_hosts:
+    #             host = self._find_available_host(net, service_key)
+    #         # Only deploy if host has enough space for both apps
+    #         if host and self.host_app_counts.get(host.name, 0) <= self.host_max_apps - len(app_defs):
+    #             for app_name, command, env_vars in app_defs:
+    #                 self.deploy_service_instance(net, service_key, app_name, command, env_vars.copy(), host=host)
+    #             self._install_flows_for_service(net, service_key)
+    #             used_hosts.add(host.name)
+    #     self._update_controller_service_members()
+
+    # def wait_for_file_content(self, host, filepath, timeout=20, interval=0.5):
+    #     waited = 0
+    #     while waited < timeout:
+    #         check = host.cmd(f"test -s {filepath} && echo 'exists'").strip()
+    #         print(f"[DEBUG] wait_for_file_content: waited={waited}, test output='{check}'")
+    #         if check == "exists":
+    #             content = host.cmd(f"cat {filepath}").strip()
+    #             print(f"[DEBUG] wait_for_file_content: read content='{content}'")
+    #             # Escludi "exists" come contenuto valido
+    #             if content and content != "exists":
+    #                 return content
+    #         time.sleep(interval)
+    #         waited += interval
+    #     return None
+    
     def wait_for_file_content(self, host, filepath, timeout=20, interval=0.5):
-        waited = 0
-        while waited < timeout:
-            check = host.cmd(f"test -s {filepath} && echo 'exists'").strip()
-            print(f"[DEBUG] wait_for_file_content: waited={waited}, test output='{check}'")
-            if check == "exists":
-                content = host.cmd(f"cat {filepath}").strip()
-                print(f"[DEBUG] wait_for_file_content: read content='{content}'")
-                # Escludi "exists" come contenuto valido
-                if content and content != "exists":
-                    return content
-            time.sleep(interval)
-            waited += interval
-        return None
-    def test_service(self, net, service_key_to_test):
+            waited = 0
+            while waited < timeout:
+                check = host.cmd(f"test -s {filepath} && echo 'exists'").strip()
+                print(f"[DEBUG] wait_for_file_content: waited={waited}, test output='{check}'")
+                if check == "exists":
+                    content = host.cmd(f"cat {filepath}").strip()
+                    print(f"[DEBUG] wait_for_file_content: read content='{content}'")
+                    # Escludi "exists" come contenuto valido
+                    if content and content != "exists":
+                        return content
+                time.sleep(interval)
+                waited += interval
+            return None
+    
+    def test_service(self, service_key_to_test):
         test_results = {}
         client_map = {"web": "web_server", "random": "random_sum", "datetime": "datetime_combiner", "colab": "colab_a"}
         for prefix, client_app in client_map.items():
@@ -328,7 +406,6 @@ class ServiceManager:
         # The current remove_flow_queue in FlowManager will iterate and delete.
         for flow_data in flows_to_remove:
             self.flow_manager.remove_flow_queue(
-                None, # No queue needed here
                 service_key,
                 flow_data['src_ip'],
                 flow_data['dst_ip'],
@@ -346,8 +423,7 @@ class ServiceManager:
         # ICMP flows between all pairs (for ping)
         for i in range(len(hosts)):
             for j in range(i+1, len(hosts)):
-                self.flow_manager.add_flow_queue( # No queue passed, FlowManager sends directly
-                    None, # Queue argument becomes None as it's not used for direct API calls
+                self.flow_manager.add_flow_queue( 
                     net, service_key,
                     hosts[i], hosts[j], ICMP
                 )
@@ -355,24 +431,24 @@ class ServiceManager:
         if service_key.startswith("web"):
             db, web = apps.get("database"), apps.get("web_server")
             if db and web:
-                self.flow_manager.add_flow_queue(None, net, service_key, web["host"], db["host"], TCP, None, db["listen_port"])
+                self.flow_manager.add_flow_queue(net, service_key, web["host"], db["host"], TCP, None, db["listen_port"])
                 self._restart_app(web, self.service_definitions["web"][1][1], {"DB_IP": db["ip"], "SERVICE_KEY": service_key})
         elif service_key.startswith("random"):
             g1, g2, summ = apps.get("random_gen1"), apps.get("random_gen2"), apps.get("random_sum")
             if g1 and g2 and summ:
-                self.flow_manager.add_flow_queue(None, net, service_key, summ["host"], g1["host"], TCP, None, g1["listen_port"])
-                self.flow_manager.add_flow_queue(None, net, service_key, summ["host"], g2["host"], TCP, None, g2["listen_port"])
+                self.flow_manager.add_flow_queue(net, service_key, summ["host"], g1["host"], TCP, None, g1["listen_port"])
+                self.flow_manager.add_flow_queue(net, service_key, summ["host"], g2["host"], TCP, None, g2["listen_port"])
                 self._restart_app(summ, self.service_definitions["random"][2][1], {"GEN1_IP": g1["ip"], "GEN2_IP": g2["ip"], "SERVICE_KEY": service_key})
         elif service_key.startswith("datetime"):
             date, timef, comb = apps.get("date_fetcher"), apps.get("time_fetcher"), apps.get("datetime_combiner")
             if date and timef and comb:
-                self.flow_manager.add_flow_queue(None, net, service_key, comb["host"], date["host"], TCP, None, date["listen_port"])
-                self.flow_manager.add_flow_queue(None, net, service_key, comb["host"], timef["host"], TCP, None, timef["listen_port"])
+                self.flow_manager.add_flow_queue(net, service_key, comb["host"], date["host"], TCP, None, date["listen_port"])
+                self.flow_manager.add_flow_queue(net, service_key, comb["host"], timef["host"], TCP, None, timef["listen_port"])
                 self._restart_app(comb, self.service_definitions["datetime"][2][1], {"DATE_IP": date["ip"], "TIME_IP": timef["ip"], "SERVICE_KEY": service_key})
         elif service_key.startswith("colab"):
             a, b = apps.get("colab_a"), apps.get("colab_b")
             if a and b:
-                self.flow_manager.add_flow_queue(None, net, service_key, a["host"], b["host"], TCP, None, b["listen_port"])
+                self.flow_manager.add_flow_queue(net, service_key, a["host"], b["host"], TCP, None, b["listen_port"])
                 self._restart_app(a, self.service_definitions["colab"][0][1], {"COLAB_B_IP": b["ip"], "SERVICE_KEY": service_key})
                               
     def _update_controller_service_members(self):

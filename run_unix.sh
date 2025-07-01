@@ -1,13 +1,11 @@
 #!/bin/bash
 
-set -e
-
 # Cleanup any previous Mininet state
 sudo mn -c
 
 # Start Ryu controller in the background
 echo "Starting Ryu controller..."
-ryu-manager --ofp-tcp-listen-port 6653 --verbose src/controller.py ryu.app.rest_conf_switch ryu.app.ofctl_rest > ryu.log 2>&1 &
+ryu-manager --ofp-tcp-listen-port 6653 --verbose src/controller.py ryu.app.ofctl_rest > ryu.log 2>&1 &
 RYU_PID=$!
 
 # Wait for Ryu REST API to be up

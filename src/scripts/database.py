@@ -13,7 +13,7 @@ fake_database = {
     "1": "Welcome to C & P world",
     "2": "Well, now you know what Narnia is",
     "3": "Welcome to Dante, Divina Commedia, your status is still not calculated. Wait in Pulgatorio please!!",
-    "4": "Item 4: The quick brown fox jumps over the lazy dog."
+    "4": "The quick brown fox jumps over the lazy dog."
 }
 
 class Handler(http.server.SimpleHTTPRequestHandler):

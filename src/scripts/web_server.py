@@ -2,6 +2,7 @@ import requests
 import sys
 import time
 import os
+import random
 
 # Define the port for the database service
 DB_PORT = 81
@@ -37,13 +38,12 @@ if __name__ == "__main__":
         sys.exit(1)
 
     result_data = []
-    # Attempt to fetch data multiple times to demonstrate connectivity
-    for i in range(1, 4):
-        # Give the database server some time to start up
-        time.sleep(2) 
-        data = fetch_data_from_db(DB_IP, str(i))
-        print(f"Fetched data (item {i}): {data}")
-        result_data.append(f"Item {i}: {data}")
+    item_id = str(random.randint(1, 4))
+    # Give the database server some time to start up
+    time.sleep(2)
+    data = fetch_data_from_db(DB_IP, item_id)
+    print(f"Fetched data (item {item_id}): {data}")
+    result_data.append(f"Item {item_id}: {data}")
 
     # Write results to a file in the shared directory
     output_path = f'/shared/{SERVICE_KEY}.txt'

@@ -1,115 +1,7 @@
-# import networkx
-# from mininet.node import OVSKernelSwitch
-
-# class FlowManager:
-#     def __init__(self):
-#         # Key: (service_key, src_ip, dst_ip, dst_port, protocol, dpid, in_port)
-#         self.active_flows = {}
-
-#     def get_switch_for_host(self, net, host_name):
-#         host = net.get(host_name)
-#         for link in net.links:
-#             if link.intf1.node == host and isinstance(link.intf2.node, OVSKernelSwitch):
-#                 return link.intf2.node
-#             elif link.intf2.node == host and isinstance(link.intf1.node, OVSKernelSwitch):
-#                 return link.intf1.node
-#         return None
-
-#     def get_port(self, net, node1, node2):
-#         for link in net.links:
-#             if link.intf1.node == node1 and link.intf2.node == node2:
-#                 return node1.ports[link.intf1]
-#             elif link.intf2.node == node1 and link.intf1.node == node2:
-#                 return node1.ports[link.intf2]
-#         return None
-
-#     def get_path(self, net, src, dst):
-#         g = networkx.Graph()
-#         for link in net.links:
-#             n1, n2 = link.intf1.node, link.intf2.node
-#             if isinstance(n1, OVSKernelSwitch) and isinstance(n2, OVSKernelSwitch):
-#                 g.add_edge(n1.name, n2.name)
-#         try:
-#             return networkx.shortest_path(g, src, dst)
-#         except Exception:
-#             return None
-
-#     def add_flow_queue(self, flow_queue, net, service_key, src_host, dst_host, protocol, src_port=None, dst_port=None):
-#         src_ip, dst_ip = src_host.IP(), dst_host.IP()
-#         sw1, sw2 = self.get_switch_for_host(net, src_host.name), self.get_switch_for_host(net, dst_host.name)
-#         in_port = self.get_port(net, sw1, src_host)
-#         out_port = self.get_port(net, sw2, dst_host)
-#         if sw1.name == sw2.name:
-#             flow = {
-#                 'action': 'add', 'dpid': sw1.dpid, 'src_ip': src_ip, 'dst_ip': dst_ip,
-#                 'protocol': protocol, 'src_port': src_port, 'dst_port': dst_port,
-#                 'in_port': in_port, 'out_port': out_port, 'priority': 200, 'service_key': service_key
-#             }
-#             flow_queue.put(flow)
-#             self.active_flows[(service_key, src_ip, dst_ip, dst_port, protocol, sw1.dpid, in_port)] = flow
-#             # Reverse flow
-#             rev_flow = flow.copy()
-#             rev_flow.update({'src_ip': dst_ip, 'dst_ip': src_ip, 'src_port': dst_port, 'dst_port': src_port,
-#                              'in_port': out_port, 'out_port': in_port})
-#             flow_queue.put(rev_flow)
-#             self.active_flows[(service_key, dst_ip, src_ip, src_port, protocol, sw1.dpid, out_port)] = rev_flow
-#             return
-
-#         path = self.get_path(net, sw1.name, sw2.name)
-#         for i, sw_name in enumerate(path):
-#             sw = net.get(sw_name)
-#             dpid = sw.dpid
-#             if i == 0:
-#                 in_p = in_port
-#                 out_p = self.get_port(net, sw, net.get(path[i+1]))
-#             elif i == len(path) - 1:
-#                 in_p = self.get_port(net, sw, net.get(path[i-1]))
-#                 out_p = out_port
-#             else:
-#                 in_p = self.get_port(net, sw, net.get(path[i-1]))
-#                 out_p = self.get_port(net, sw, net.get(path[i+1]))
-#             flow = {
-#                 'action': 'add', 'dpid': dpid, 'src_ip': src_ip, 'dst_ip': dst_ip,
-#                 'protocol': protocol, 'src_port': src_port, 'dst_port': dst_port,
-#                 'in_port': in_p, 'out_port': out_p, 'priority': 100, 'service_key': service_key
-#             }
-#             flow_queue.put(flow)
-#             self.active_flows[(service_key, src_ip, dst_ip, dst_port, protocol, dpid, in_p)] = flow
-#             # Reverse flow
-#             rev_flow = flow.copy()
-#             rev_flow.update({'src_ip': dst_ip, 'dst_ip': src_ip, 'src_port': dst_port, 'dst_port': src_port,
-#                              'in_port': out_p, 'out_port': in_p})
-#             flow_queue.put(rev_flow)
-#             self.active_flows[(service_key, dst_ip, src_ip, src_port, protocol, dpid, out_p)] = rev_flow
-
-#     def remove_flow_queue(self, flow_queue, service_key, src_ip, dst_ip, protocol=None, src_port=None, dst_port=None):
-#         keys = [k for k in self.active_flows if k[0] == service_key and k[1] == src_ip and k[2] == dst_ip and
-#                 (protocol is None or k[4] == protocol) and (dst_port is None or k[3] == dst_port)]
-#         for k in keys:
-#             flow = self.active_flows[k]
-#             flow_data = flow.copy()
-#             flow_data['action'] = 'remove'
-#             flow_queue.put(flow_data)
-#             del self.active_flows[k]
-
-#     def get_active_flows(self):
-#         return self.active_flows.copy()
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 import networkx
 from mininet.node import OVSKernelSwitch
-import requests # Import the requests library
-import json # For JSON serialization
+import requests 
+import json 
 
 class FlowManager:
     def __init__(self, ryu_api_url='http://localhost:8080'): # Add Ryu API URL
@@ -181,7 +73,6 @@ class FlowManager:
             "actions": actions
         }
 
-        # Per rimozione, puoi eliminare cookie e cookie_mask per evitare errori
         if flow_action == 'remove':
             flow_entry.pop("cookie")
             flow_entry.pop("cookie_mask")
@@ -194,7 +85,7 @@ class FlowManager:
         except requests.exceptions.RequestException as e:
             print(f"[ERROR] Failed to {flow_action} flow via Ryu API for DPID {dpid_int}: {e}")
 
-    def add_flow_queue(self, flow_queue, net, service_key, src_host, dst_host, protocol, src_port=None, dst_port=None):
+    def add_flow_queue(self, net, service_key, src_host, dst_host, protocol, src_port=None, dst_port=None):
         # The flow_queue concept will be less critical if you're directly pushing to Ryu,
         # but you can still use it for logging or for batching if needed.
         # For direct API interaction, we'll send immediately.
@@ -250,7 +141,7 @@ class FlowManager:
             self._send_flow_to_ryu(rev_flow_params)
             self.active_flows[(service_key, dst_ip, src_ip, src_port, protocol, dpid, out_p)] = rev_flow_params
 
-    def remove_flow_queue(self, flow_queue, service_key, src_ip, dst_ip, protocol=None, src_port=None, dst_port=None):
+    def remove_flow_queue(self, service_key, src_ip, dst_ip, protocol=None, src_port=None, dst_port=None):
         keys = [k for k in self.active_flows if k[0] == service_key and k[1] == src_ip and k[2] == dst_ip and
                 (protocol is None or k[4] == protocol) and (dst_port is None or k[3] == dst_port)]
         for k in keys:
