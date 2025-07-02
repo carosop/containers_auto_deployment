@@ -1,11 +1,9 @@
 import socket
 import sys
 import os
-import time
 
-# Define the port for colab_b
 COLAB_B_PORT = 5004
-# Get IP address from environment variable
+# IP address from environment variable
 COLAB_B_IP = os.getenv('COLAB_B_IP')
 SERVICE_KEY = os.getenv('SERVICE_KEY', 'unknown')
 
@@ -24,7 +22,7 @@ if __name__ == "__main__":
     result_str = ""
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.settimeout(10) # Set a timeout
+            s.settimeout(10)
             s.connect((COLAB_B_IP, COLAB_B_PORT))
             message = "Hello from Colab A!"
             s.sendall(message.encode())

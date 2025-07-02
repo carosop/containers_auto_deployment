@@ -1,9 +1,8 @@
 import socket
 import sys
-import os
 import time
 
-# Define the port for colab_b to listen on
+# port for colab_b to listen on
 PORT = 5004
 # Bind to 0.0.0.0
 HOST = "0.0.0.0"

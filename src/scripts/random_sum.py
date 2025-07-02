@@ -1,14 +1,12 @@
-import time
 import os
 import socket
 import sys
 
-# Define ports for the random generators
+# ports for the random generators
 GEN1_PORT = 5000
 GEN2_PORT = 5001
 
 # Get IP addresses from environment variables
-# These will be set by ServiceManager
 GEN1_IP = os.getenv('GEN1_IP')
 GEN2_IP = os.getenv('GEN2_IP')
 SERVICE_KEY = os.getenv('SERVICE_KEY', 'unknown')

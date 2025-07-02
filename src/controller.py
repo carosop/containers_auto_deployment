@@ -57,7 +57,7 @@ class Controller(app_manager.RyuApp):
         if eth.ethertype == ether_types.ETH_TYPE_ARP:
             return
 
-        # If it's not an IP packet we're interested in, drop it or flood if needed
+        # If not an IP packet we're interested in, drop it or flood
         if eth.ethertype != ether_types.ETH_TYPE_IP:
             return
 
@@ -67,23 +67,3 @@ class Controller(app_manager.RyuApp):
 
         self.logger.warning(f"[WARNING] Packet-in for unhandled IP traffic: {src_ip} -> {dst_ip} on DPID {datapath.id}, in_port {in_port}")
         
-        # Since flows are installed proactively by FlowManager,
-        # any IP packet reaching here means there's no specific flow for it.
-        # You can decide how to handle this:
-        # 1. Drop the packet (default for unhandled traffic)
-        # 2. Flood it (if you want default connectivity but prefer explicit flows for services)
-        # 3. Dynamically install a default "flood" flow (less ideal for controlled SDN)
-        
-        # For now, we'll let the default table-miss handle it, which sends it back to the controller.
-        # Since we've removed the reactive flow installation, these packets will continue
-        # to hit the controller until a specific flow is installed by the FlowManager.
-        # This serves as a debugging point: if a service flow isn't working, you'll see
-        # these warnings.
-        
-        # To avoid continuous PacketIn for the same flow, you might consider installing
-        # a drop flow for such unhandled packets or a temporary flood, but for a
-        # proactive system, the goal is to *not* have these packets reach here.
-        
-        # If you still want a "default allowed" flow for unhandled IP traffic within
-        # the same service *after* the proactive flows, you'd need the service_members
-        # here, but the core idea is to rely on proactive installation.

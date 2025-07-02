@@ -1,77 +1,132 @@
-# Containers auto deployment
+# Containers Auto Deployment
 
-This project automates the deployment and management of Docker services on an SDN network using Mininet and a Ryu controller. <br />
-It supports two network topologies: a simple topology with four switches and six Docker hosts, and a complex topology with six switches and eight Docker hosts. <br />
-The project includes a GUI for deploying, stopping and testing services, and automatically configures SDN flows for communication between services.
+This project automates the deployment and management of services on an SDN network using Mininet and a Ryu controller.   <br />
+It supports two network topologies: a simple topology with four switches and six hosts and a complex topology with six switches and twelwe hosts.   <br />
+The project includes a GUI for deploying, stopping, and testing services, and automatically configures SDN flows for communication between services.
+
+---
 
 ## Project Structure
 
 ```
 containers_auto_deployment
 ├── src
-│   ├── scripts
-│   │   ├── web_server.py
-│   │   ├── random_gen1.py
-│   │   ├── random_gen2.py
-│   │   ├── random_sum.py
-│   │   ├── date_fetcher.py
-│   │   ├── time_fetcher.py
-│   │   ├── database.py
-│   │   └── datetime_combiner.py
-│   ├── main.py
-│   ├── gui.py
-│   ├── network.py
-│   └── services.py
-├── requirements.txt
-├── Dockerfile
-└── README.md
+│   ├── scripts                     # Service scripts
+│   │   ├── colab_a.py             
+│   │   ├── colab_b.py              
+│   │   ├── database.py             
+│   │   ├── date_fetcher.py         
+│   │   ├── datetime_combiner.py    
+│   │   ├── random_gen1.py          
+│   │   ├── random_gen2.py          
+│   │   ├── random_sum.py           
+│   │   ├── time_fetcher.py         
+│   │   └── web_server.py           
+│   ├── main.py                     # Application entry point
+│   ├── gui.py                      # GUI logic
+│   ├── network.py                  # Topology management
+│   ├── services.py                 # Service deployment logic
+│   ├── flow.py                     # SDN flow manager
+│   └── controller.py               # Ryu SDN controller
+├── install_dependencies.sh         # Dependency installer script
+├── run_unix.sh                     # Run script (Unix)
+├── run_windows.sh                  # Run script (Windows)
+└── README.md                       
 ```
+---
 
 ## Setup Instructions
 
-1. **Install Comnetsemu (preferably using Vagrant)**:<br />
-   This project is designed to work within the Comnetsemu environment.<br />
-      You can find the installation instructions here:<br />
-      https://git.comnets.net/public-repo/comnetsemu#installation
+### 1. **Install Comnetsemu (preferably using Vagrant):**
 
-      For additional information, refer to:<br />
-      https://www.granelli-lab.org/researches/relevant-projects/comnetsemu-labs
+This project is designed to work within the Comnetsemu environment.  
+You can find the installation instructions here:  
+https://git.comnets.net/public-repo/comnetsemu#installation
 
-2. **Clone the repository:**
+For additional information, refer to:  
+https://www.granelli-lab.org/researches/relevant-projects/comnetsemu-labs
+
+---
+
+### 2. **Clone the repository inside comnetsemu:**
+
+```bash
+git clone https://github.com/carosop/containers_auto_deployment.git
+cd containers_auto_deployment
+```
+
+---
+
+### 3. **Install dependencies:**
+
+Use the provided script to install all required system and Python packages:
+
+```bash
+chmod +x install_dependencies.sh
+./install_dependencies.sh
+```
+
+---
+
+### 4. **Run the application:**
+
+#### **Recommended: Use the provided run script**
+
+For Unix/Linux:
+```bash
+chmod +x run_unix.sh
+./run_unix.sh
+```
+
+For Windows (WSL/Mininet VM):
+```bash
+chmod +x run_windows.sh
+./run_windows.sh
+```
+
+These scripts will:
+- Clean up any previous Mininet state
+- Start the Ryu controller (with REST API and your custom controller)
+- Wait for Ryu to be ready
+- Start the main application (with GUI)
+- Clean up on exit
+
+#### **Manual Run:**
+
+1. **Start the Ryu controller (with REST API):**
    ```bash
-   git clone <repository-url>
-   cd containers_auto_deployment
-   ```
-# TODO change readme --> controller internal
-3. **Check the Comnetsemu version**: <br />
-   This project was developed on Ubuntu 20.04 with Comnetsemu (ubuntu-20.04-comnetsemu). <br />
-   Ensure that the Ryu controller is located at:
-      ```bash
-      /usr/lib/python3/dist-packages/ryu/app/simple_switch_stp_13.py
-      ```
-      Verify the *path* variable in the `network.py` file:
-      ```bash
-      cd src
-      nano network.py
-      ```
-      If necessary, update the *path* variable in the **start_ryu_controller** function to match your Ryu controller location:
-      ```python
-      def start_ryu_controller():
-          """
-          Start the Ryu controller.
-          """
-          path = "/path/to/your/ryu/controller/simple_switch_stp_13.py"
-          ...
-      ```
-
-4. **Build the Docker image:**
-   ```bash
-   sudo python3 -m pip install networkx
-   docker build -t auto_deployment .
+   ryu-manager --ofp-tcp-listen-port 6653 --verbose src/controller.py ryu.app.ofctl_rest > ryu.log 2>&1 &
    ```
 
-5. **Run the application:**
-   Execute the main script:
+2. **Start the main application:**
    ```bash
    sudo python3 src/main.py
    ```
+
+---
+
+## Usage
+
+- On startup, select the topology type (simple or complex).
+- The GUI will launch automatically.
+- Use the GUI to deploy, stop, and test services.
+- The system will automatically manage SDN flows for service communication.
+- Service results and logs are written to `/shared` on each host.
+
+---
+
+## Notes
+
+- The Ryu controller is **internal** to this project: see [`src/controller.py`](src/controller.py).
+- The REST API (`ryu.app.ofctl_rest`) is required for dynamic flow management.
+- All service scripts are copied to each Mininet host under `/shared/scripts/`.
+- The `/shared` directory is used for inter-process communication and result files.
+- The GUI uses Tkinter; ensure you have X11 forwarding enabled if running remotely.
+
+---
+
+## Troubleshooting
+- If the GUI does not appear, check your X11 forwarding settings.
+- If services fail to deploy, check that all dependencies are installed and that `/shared/scripts/` exists on each host.
+- For controller or flow issues, check `ryu.log` for errors.
+

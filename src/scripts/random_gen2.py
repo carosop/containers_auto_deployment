@@ -1,10 +1,9 @@
 import random
 import time
-import os
 import socket
 import sys
 
-# Define the port for this generator (different from random_gen1 if on same host)
+# port for this random_gen2
 PORT = 5001 
 # Bind to 0.0.0.0 to be accessible from any IP address on the host
 HOST = "0.0.0.0"
@@ -31,5 +30,5 @@ if __name__ == "__main__":
                 random_num = generate_random()
                 conn.sendall(random_num.encode()) # Send the random number
                 print(f"Sent {random_num}")
-            # Add a small delay
+            # small delay
             time.sleep(1)

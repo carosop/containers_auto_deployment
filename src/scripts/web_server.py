@@ -4,10 +4,9 @@ import time
 import os
 import random
 
-# Define the port for the database service
+# port for the database service
 DB_PORT = 81
-# Get the IP address of the database server from environment variable
-# This will be set by the ServiceManager when deploying the service
+# IP address of the database server from environment variable
 DB_IP = os.getenv('DB_IP')
 # Get the service key to identify the output file
 SERVICE_KEY = os.getenv('SERVICE_KEY', 'unknown')
@@ -21,7 +20,7 @@ def fetch_data_from_db(db_ip, item_id):
     """
     url = f"http://{db_ip}:{DB_PORT}/{item_id}"
     try:
-        # Make an HTTP GET request to the database server
+        # HTTP GET request to the database server
         response = requests.get(url, timeout=5)
         response.raise_for_status() # Raise HTTPError for bad responses (4xx or 5xx)
         return response.text
@@ -29,7 +28,7 @@ def fetch_data_from_db(db_ip, item_id):
         return f"Error fetching from DB ({db_ip}): {e}"
 
 if __name__ == "__main__":
-    # Ensure standard output is flushed immediately
+    # standard output is flushed immediately
     sys.stdout.flush() 
     print(f"Web server started. Attempting to connect to DB at {DB_IP}:{DB_PORT}")
 

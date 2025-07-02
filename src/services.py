@@ -16,12 +16,12 @@ class ServiceManager:
         self.service_definitions = {
             "web": [
                 ("database", "python3 /shared/scripts/database.py", {"LISTEN_PORT": "81"}),
-                ("web_server", "python3 /shared/scripts/web_server.py", {"DB_IP": None, "LISTEN_PORT": "80"})
+                ("web_server", "python3 /shared/scripts/web_server.py", {"DB_IP": None, "LISTEN_PORT": "85"})
             ],
             "random": [
                 ("random_gen1", "python3 /shared/scripts/random_gen1.py", {"LISTEN_PORT": "5000"}),
                 ("random_gen2", "python3 /shared/scripts/random_gen2.py", {"LISTEN_PORT": "5001"}),
-                ("random_sum", "python3 /shared/scripts/random_sum.py", {"GEN1_IP": None, "GEN2_IP": None, "LISTEN_PORT": "8080"})
+                ("random_sum", "python3 /shared/scripts/random_sum.py", {"GEN1_IP": None, "GEN2_IP": None, "LISTEN_PORT": "8083"})
             ],
             "datetime": [
                 ("date_fetcher", "python3 /shared/scripts/date_fetcher.py", {"LISTEN_PORT": "5002"}),
@@ -34,12 +34,13 @@ class ServiceManager:
             ]
         }
         self.controller = controller
-        self.flow_modification_queue = None  # or queue.Queue() if you use it directly
-
+        self.flow_modification_queue = None
+        
+         
     def get_flow_queue(self):
         return self.flow_modification_queue
 
-    def _find_available_host(self, net, service_key, used_hosts=None):
+    def _find_available_host(self, net, used_hosts=None):
         # used_hosts: set of host names already used for this service_key
         if used_hosts is None:
             used_hosts = set()
@@ -52,7 +53,7 @@ class ServiceManager:
 
     def deploy_service_instance(self, net, service_key, app_name, command, env_vars, host=None, used_hosts=None):
         if not host:
-            host = self._find_available_host(net, service_key, used_hosts)
+            host = self._find_available_host(net, used_hosts)
         if not host:
             print(f"[ERROR] No available host for {service_key}-{app_name}")
             return False
@@ -182,10 +183,10 @@ class ServiceManager:
             service_key = f"{service_name}-{self.service_counters[service_name]}"
             used_hosts = set()
             for idx, (app_name, command, env_vars) in enumerate(app_defs):
-                host = self._find_available_host(net, service_key, used_hosts)
+                host = self._find_available_host(net, used_hosts)
                 # Fallback: if not enough hosts, allow reuse for this service instance
                 if not host and used_hosts:
-                    host = self._find_available_host(net, service_key)
+                    host = self._find_available_host(net)
                 if not self.deploy_service_instance(net, service_key, app_name, command, env_vars.copy(), host=host):
                     print(f"[ERROR] Failed to deploy {app_name} for {service_key}. Rolling back.")
                     self.stop_service_instance(service_key)
@@ -193,7 +194,6 @@ class ServiceManager:
                 if host:
                     used_hosts.add(host.name)
             self._install_flows_for_service(net, service_key)
-            self._update_controller_service_members() # Keep if you use it for other controller logic
             self.active_flows = self.flow_manager.get_active_flows() # Update local active flows from FlowManager
             print(f"[SUCCESS] Service '{service_key}' deployed.")
             if gui:
@@ -206,7 +206,6 @@ class ServiceManager:
             parts = selected_process.split(', ')
             service_key = parts[0].split(': ')[1]
             if self.stop_service_instance(service_key):
-                self._update_controller_service_members() # Keep if you use it for other controller logic
                 print("[DEBUG] Calling try_redeploy_colab after stopping service")
                 self.try_redeploy_colab(net)
                 print("[DEBUG] Finished try_redeploy_colab")
@@ -222,10 +221,10 @@ class ServiceManager:
         for _ in net.hosts:
             service_key = f"colab-{len(self.service_instances)//len(app_defs)+1}"
             for app_name, command, env_vars in app_defs:
-                host = self._find_available_host(net, service_key, used_hosts)
+                host = self._find_available_host(net, used_hosts)
                 # If no unused host, allow reuse for this service instance
                 if not host and used_hosts:
-                    host = self._find_available_host(net, service_key)
+                    host = self._find_available_host(net)
                 if not self.deploy_service_instance(net, service_key, app_name, command, env_vars.copy(), host=host):
                     print(f"[ERROR] Failed to deploy {app_name} for {service_key}. Rolling back.")
                     self.stop_service_instance(service_key)
@@ -233,7 +232,6 @@ class ServiceManager:
                 if host:
                     used_hosts.add(host.name)
             self._install_flows_for_service(net, service_key)
-        self._update_controller_service_members()
 
     def try_redeploy_colab(self, net):
         print("[DEBUG] try_redeploy_colab started")
@@ -295,46 +293,6 @@ class ServiceManager:
             else:
                 break
 
-        self._update_controller_service_members()
-
-    # def try_redeploy_colab(self, net):
-    #     print("[DEBUG] try_redeploy_colab started")
-    #     service_name = "colab"
-    #     app_defs = self.service_definitions[service_name]
-    #     used_hosts = set(inst["host"].name for (k, _), inst in self.service_instances.items() if k.startswith("colab"))
-    #     for _ in net.hosts:
-    #         # Find a service_key not already used
-    #         idx = 1
-    #         while f"colab-{idx}" in (k for (k, _) in self.service_instances):
-    #             idx += 1
-    #         service_key = f"colab-{idx}"
-    #         # Find available host, prefer unused
-    #         host = self._find_available_host(net, service_key, used_hosts)
-    #         if not host and used_hosts:
-    #             host = self._find_available_host(net, service_key)
-    #         # Only deploy if host has enough space for both apps
-    #         if host and self.host_app_counts.get(host.name, 0) <= self.host_max_apps - len(app_defs):
-    #             for app_name, command, env_vars in app_defs:
-    #                 self.deploy_service_instance(net, service_key, app_name, command, env_vars.copy(), host=host)
-    #             self._install_flows_for_service(net, service_key)
-    #             used_hosts.add(host.name)
-    #     self._update_controller_service_members()
-
-    # def wait_for_file_content(self, host, filepath, timeout=20, interval=0.5):
-    #     waited = 0
-    #     while waited < timeout:
-    #         check = host.cmd(f"test -s {filepath} && echo 'exists'").strip()
-    #         print(f"[DEBUG] wait_for_file_content: waited={waited}, test output='{check}'")
-    #         if check == "exists":
-    #             content = host.cmd(f"cat {filepath}").strip()
-    #             print(f"[DEBUG] wait_for_file_content: read content='{content}'")
-    #             # Escludi "exists" come contenuto valido
-    #             if content and content != "exists":
-    #                 return content
-    #         time.sleep(interval)
-    #         waited += interval
-    #     return None
-    
     def wait_for_file_content(self, host, filepath, timeout=20, interval=0.5):
             waited = 0
             while waited < timeout:
@@ -393,7 +351,7 @@ class ServiceManager:
 
 
     def _remove_flows_for_service(self, service_key):
-        # The FlowManager now handles the direct API calls for removal
+        # The FlowManager handles the direct API calls for removal
         flows = self.flow_manager.get_active_flows()
         flows_to_remove = []
         for (s_k, src_ip, dst_ip, dst_port, proto, dpid, in_port), flow in list(flows.items()):
@@ -401,9 +359,6 @@ class ServiceManager:
                 flows_to_remove.append(flow) # Collect flows associated with the service_key
                 
         # Call remove_flow_queue (which now calls _send_flow_to_ryu for removal) for each.
-        # Note: You might want to pass more specific info to remove_flow_queue if you want to delete
-        # by specific match fields rather than just the service_key.
-        # The current remove_flow_queue in FlowManager will iterate and delete.
         for flow_data in flows_to_remove:
             self.flow_manager.remove_flow_queue(
                 service_key,
@@ -450,17 +405,4 @@ class ServiceManager:
             if a and b:
                 self.flow_manager.add_flow_queue(net, service_key, a["host"], b["host"], TCP, None, b["listen_port"])
                 self._restart_app(a, self.service_definitions["colab"][0][1], {"COLAB_B_IP": b["ip"], "SERVICE_KEY": service_key})
-                              
-    def _update_controller_service_members(self):
-        # This method is less critical for *flow installation* now,
-        # but if your controller or GUI still relies on this mapping for other reasons, keep it.
-        # The controller won't be reactively installing flows based on this.
-        mapping = {}
-        for (service_key, _), inst in self.service_instances.items():
-            mapping.setdefault(service_key, []).append(inst["ip"])
-        if self.controller:
-            # If your Ryu controller still has update_service_members for logging or other (non-flow) logic,
-            # you can keep this call. Otherwise, it can be removed.
-            # For this proactive approach, the controller itself doesn't need to know service members for flow decisions.
-            self.controller.update_service_members(mapping)
 

@@ -1,10 +1,9 @@
 import random
 import time
-import os
 import socket
 import sys
 
-# Define the port for this generator
+# port for this generator
 PORT = 5000 
 # Bind to 0.0.0.0 to be accessible from any IP address on the host
 HOST = "0.0.0.0"

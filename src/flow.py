@@ -38,7 +38,7 @@ class FlowManager:
 
     def _send_flow_to_ryu(self, flow_data):
         dpid = flow_data['dpid']
-        flow_action = flow_data['action']  # 'add' o 'remove'
+        flow_action = flow_data['action']  # 'add' or 'remove'
         dpid_int = int(dpid, 16) if isinstance(dpid, str) else dpid
 
         url = f"{self.ryu_api_url}/stats/flowentry/{flow_action}"  # cmd endpoint
@@ -85,11 +85,7 @@ class FlowManager:
         except requests.exceptions.RequestException as e:
             print(f"[ERROR] Failed to {flow_action} flow via Ryu API for DPID {dpid_int}: {e}")
 
-    def add_flow_queue(self, net, service_key, src_host, dst_host, protocol, src_port=None, dst_port=None):
-        # The flow_queue concept will be less critical if you're directly pushing to Ryu,
-        # but you can still use it for logging or for batching if needed.
-        # For direct API interaction, we'll send immediately.
-        
+    def add_flow_queue(self, net, service_key, src_host, dst_host, protocol, src_port=None, dst_port=None):        
         src_ip, dst_ip = src_host.IP(), dst_host.IP()
         sw1, sw2 = self.get_switch_for_host(net, src_host.name), self.get_switch_for_host(net, dst_host.name)
         in_port = self.get_port(net, sw1, src_host)

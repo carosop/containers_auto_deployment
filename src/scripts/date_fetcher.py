@@ -1,10 +1,9 @@
 import time
-import os
 import socket
 import sys
 from datetime import datetime
 
-# Define the port for the date fetcher
+# port for the date fetcher
 PORT = 5002
 # Bind to 0.0.0.0
 HOST = "0.0.0.0"

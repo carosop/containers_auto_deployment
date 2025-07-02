@@ -1,13 +1,12 @@
-import time
 import os
 import socket
 import sys
 
-# Define ports for date and time fetchers
+# ports for date and time fetchers
 DATE_PORT = 5002
 TIME_PORT = 5003
 
-# Get IP addresses from environment variables
+# IP addresses from environment variables
 DATE_IP = os.getenv('DATE_IP')
 TIME_IP = os.getenv('TIME_IP')
 SERVICE_KEY = os.getenv('SERVICE_KEY', 'unknown')

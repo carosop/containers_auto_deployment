@@ -1,10 +1,9 @@
 import time
-import os
 import socket
 import sys
 from datetime import datetime
 
-# Define the port for the time fetcher
+# port for the time fetcher
 PORT = 5003
 # Bind to 0.0.0.0
 HOST = "0.0.0.0"
@@ -14,7 +13,7 @@ def fetch_time():
     return datetime.now().strftime('%H:%M:%S')
 
 if __name__ == "__main__":
-    # Ensure standard output is flushed immediately
+    # standard output is flushed immediately
     sys.stdout.flush() 
     print(f"Time Fetcher started. Listening on {HOST}:{PORT}")
 
