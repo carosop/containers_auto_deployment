@@ -97,62 +97,31 @@ class ServiceManager:
         self._remove_flows_for_service(service_key)
         return True
 
-    def _remove_flows_for_service(self, service_key):
-        flows = self.flow_manager.get_active_flows()
-        for (s_k, src_ip, dst_ip, dst_port, proto, dpid, in_port), flow in list(flows.items()):
-            if s_k == service_key:
-                self.flow_manager.remove_flow_queue(service_key, src_ip, dst_ip, proto, None, dst_port)
-
-    def _install_flows_for_service(self, net, service_key):
-        apps = {app: inst for (s_k, app), inst in self.service_instances.items() if s_k == service_key}
-        TCP = 6
-        ICMP = 1
-        hosts = [inst["host"] for inst in apps.values()]
-        # ICMP flows between all pairs (for ping)
-        for i in range(len(hosts)):
-            for j in range(i+1, len(hosts)):
-                self.flow_manager.add_flow_queue(net, service_key,hosts[i], hosts[j], ICMP)
-        # Service-specific TCP flows and env updates
-        if service_key.startswith("web"):
-            db, web = apps.get("database"), apps.get("web_server")
-            if db and web:
-                self.flow_manager.add_flow_queue(net, service_key, web["host"], db["host"], TCP, None, db["listen_port"])
-                self._restart_app(web, self.service_definitions["web"][1][1], {"DB_IP": db["ip"], "SERVICE_KEY": service_key})
-        elif service_key.startswith("random"):
-            g1, g2, summ = apps.get("random_gen1"), apps.get("random_gen2"), apps.get("random_sum")
-            if g1 and g2 and summ:
-                self.flow_manager.add_flow_queue(net, service_key, summ["host"], g1["host"], TCP, None, g1["listen_port"])
-                self.flow_manager.add_flow_queue(net, service_key, summ["host"], g2["host"], TCP, None, g2["listen_port"])
-                self._restart_app(summ, self.service_definitions["random"][2][1], {"GEN1_IP": g1["ip"], "GEN2_IP": g2["ip"], "SERVICE_KEY": service_key})
-        elif service_key.startswith("datetime"):
-            date, timef, comb = apps.get("date_fetcher"), apps.get("time_fetcher"), apps.get("datetime_combiner")
-            if date and timef and comb:
-                self.flow_manager.add_flow_queue(net, service_key, comb["host"], date["host"], TCP, None, date["listen_port"])
-                self.flow_manager.add_flow_queue(net, service_key, comb["host"], timef["host"], TCP, None, timef["listen_port"])
-                self._restart_app(comb, self.service_definitions["datetime"][2][1], {"DATE_IP": date["ip"], "TIME_IP": timef["ip"], "SERVICE_KEY": service_key})
-        elif service_key.startswith("colab"):
-            a, b = apps.get("colab_a"), apps.get("colab_b")
-            if a and b:
-                self.flow_manager.add_flow_queue(net, service_key, a["host"], b["host"], TCP, None, b["listen_port"])
-                self._restart_app(a, self.service_definitions["colab"][0][1], {"COLAB_B_IP": b["ip"], "SERVICE_KEY": service_key})
-
-    def _restart_app(self, inst, command, env_updates):
-        proc = inst["process"]
-        host = inst["host"]
+    def _restart_app(self, instance, command, env_updates):
+        # Get the current process and host for the app instance
+        process = instance["process"]
+        host = instance["host"]
         try:
-            if proc and proc.poll() is None:
-                os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
+            # If the process is running, terminate it gracefully
+            if process and process.poll() is None:
+                os.killpg(os.getpgid(process.pid), signal.SIGTERM)
                 time.sleep(0.5)
-                if proc.poll() is None:
-                    os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
-                proc.wait(timeout=1)
+                # If still running, force kill it
+                if process.poll() is None:
+                    os.killpg(os.getpgid(process.pid), signal.SIGKILL)
+                process.wait(timeout=1)
         except Exception:
+            # Ignore errors during process termination
             pass
+        # Prepare the environment variables for the new process
         env = {line.split('=', 1)[0]: line.split('=', 1)[1] for line in host.cmd("env").strip().split('\n') if '=' in line}
         env.update(env_updates)
+        # Split the command into arguments
         cmd_args = command.split()
-        new_proc = host.popen(cmd_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=os.setsid, env=env)
-        inst["process"] = new_proc
+        # Start the new process with the updated environment
+        new_process = host.popen(cmd_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=os.setsid, env=env)
+        # Update the instance with the new process
+        instance["process"] = new_process
 
     def control_services(self, net, action, service_name=None, selected_process=None, gui=None):
         if action == "deploy":
@@ -317,9 +286,9 @@ class ServiceManager:
         else:
             test_results[service_key_to_test] = "Error: No client application defined."
             return test_results
-        inst = next((info for (s_k, a_n), info in self.service_instances.items() if s_k == service_key_to_test and a_n == client_app), None)
-        if inst:
-            host = inst["host"]
+        instance = next((info for (s_k, a_n), info in self.service_instances.items() if s_k == service_key_to_test and a_n == client_app), None)
+        if instance:
+            host = instance["host"]
             output_file = f"/shared/{service_key_to_test}.txt"
             content = self.wait_for_file_content(host, output_file)
             if content:
@@ -343,7 +312,7 @@ class ServiceManager:
             print(f"[INFO] Cleaned up /shared folder.")
 
     def update_gui_with_active_services(self):
-        return [f"Service: {s_k}, App: {a_n}, Host: {inst['host'].name}, IP: {inst['ip']}" for (s_k, a_n), inst in self.service_instances.items()]
+        return [f"Service: {s_k}, App: {a_n}, Host: {instance['host'].name}, IP: {instance['ip']}" for (s_k, a_n), instance in self.service_instances.items()]
 
     def update_gui_with_active_flows(self):
         self.active_flows = self.flow_manager.get_active_flows()
@@ -370,7 +339,7 @@ class ServiceManager:
             )
 
     def _install_flows_for_service(self, net, service_key):
-        apps = {app: inst for (s_k, app), inst in self.service_instances.items() if s_k == service_key}
+        apps = {app: instance for (s_k, app), instance in self.service_instances.items() if s_k == service_key}
         TCP = 6
         ICMP = 1
         hosts = [inst["host"] for inst in apps.values()]
@@ -389,20 +358,19 @@ class ServiceManager:
                 self.flow_manager.add_flow_queue(net, service_key, web["host"], db["host"], TCP, None, db["listen_port"])
                 self._restart_app(web, self.service_definitions["web"][1][1], {"DB_IP": db["ip"], "SERVICE_KEY": service_key})
         elif service_key.startswith("random"):
-            g1, g2, summ = apps.get("random_gen1"), apps.get("random_gen2"), apps.get("random_sum")
-            if g1 and g2 and summ:
-                self.flow_manager.add_flow_queue(net, service_key, summ["host"], g1["host"], TCP, None, g1["listen_port"])
-                self.flow_manager.add_flow_queue(net, service_key, summ["host"], g2["host"], TCP, None, g2["listen_port"])
-                self._restart_app(summ, self.service_definitions["random"][2][1], {"GEN1_IP": g1["ip"], "GEN2_IP": g2["ip"], "SERVICE_KEY": service_key})
+            g1, g2, sum = apps.get("random_gen1"), apps.get("random_gen2"), apps.get("random_sum")
+            if g1 and g2 and sum:
+                self.flow_manager.add_flow_queue(net, service_key, sum["host"], g1["host"], TCP, None, g1["listen_port"])
+                self.flow_manager.add_flow_queue(net, service_key, sum["host"], g2["host"], TCP, None, g2["listen_port"])
+                self._restart_app(sum, self.service_definitions["random"][2][1], {"GEN1_IP": g1["ip"], "GEN2_IP": g2["ip"], "SERVICE_KEY": service_key})
         elif service_key.startswith("datetime"):
-            date, timef, comb = apps.get("date_fetcher"), apps.get("time_fetcher"), apps.get("datetime_combiner")
-            if date and timef and comb:
-                self.flow_manager.add_flow_queue(net, service_key, comb["host"], date["host"], TCP, None, date["listen_port"])
-                self.flow_manager.add_flow_queue(net, service_key, comb["host"], timef["host"], TCP, None, timef["listen_port"])
-                self._restart_app(comb, self.service_definitions["datetime"][2][1], {"DATE_IP": date["ip"], "TIME_IP": timef["ip"], "SERVICE_KEY": service_key})
+            date, time, combiner = apps.get("date_fetcher"), apps.get("time_fetcher"), apps.get("datetime_combiner")
+            if date and time and combiner:
+                self.flow_manager.add_flow_queue(net, service_key, combiner["host"], date["host"], TCP, None, date["listen_port"])
+                self.flow_manager.add_flow_queue(net, service_key, combiner["host"], time["host"], TCP, None, time["listen_port"])
+                self._restart_app(combiner, self.service_definitions["datetime"][2][1], {"DATE_IP": date["ip"], "TIME_IP": time["ip"], "SERVICE_KEY": service_key})
         elif service_key.startswith("colab"):
             a, b = apps.get("colab_a"), apps.get("colab_b")
             if a and b:
                 self.flow_manager.add_flow_queue(net, service_key, a["host"], b["host"], TCP, None, b["listen_port"])
                 self._restart_app(a, self.service_definitions["colab"][0][1], {"COLAB_B_IP": b["ip"], "SERVICE_KEY": service_key})
-
