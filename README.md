@@ -1,7 +1,7 @@
 # Containers Auto Deployment
 
-This project automates the deployment and management of services on an SDN network using Mininet and a Ryu controller.   <br />
-It supports two network topologies: a simple topology with four switches and six hosts and a complex topology with six switches and twelwe hosts.   <br />
+This project automates the deployment and management of services on an SDN network using Mininet and a Ryu controller. <br />
+It supports two network topologies: a simple topology with four switches and six hosts and a complex topology with seven switches and nineteen hosts. <br />
 The project includes a GUI for deploying, stopping, and testing services, and automatically configures SDN flows for communication between services.
 
 ---
