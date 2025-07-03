@@ -14,5 +14,15 @@ if __name__ == "__main__":
         print("[ERROR] Invalid choice. Exiting.")
         exit(1)
 
-    network_manager = NetworkManager(topology_type)
+    print("Select the link layout:")
+    print("1. Ring ")
+    print("2. Linear")
+    layout_choice = input("Enter the number of your choice: ")
+
+    if layout_choice == "2":
+        link_type = "linear"
+    else:
+        link_type = "ring"  
+
+    network_manager = NetworkManager(topology_type, link_type=link_type)
     network_manager.start_network()

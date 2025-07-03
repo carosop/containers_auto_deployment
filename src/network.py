@@ -15,38 +15,34 @@ class MyTopo:
     Defines a simple SDN topology with multiple switches and standard hosts.
     Each host is connected to a switch and switches are connected in a ring.
     """
-    def build(self, net, num_hosts, num_switches, bw_h, bw_s):
-        # Switches
+    def build(self, net, num_hosts, num_switches, bw_h, bw_s, link_type="ring"):
         switches = []
         for i in range(1, num_switches + 1):
-            switch = net.addSwitch(f"s{i}")
-            switches.append(switch)
-            
-        for i in range(1, num_hosts + 1):
-            net.addHost(f"h{i}") 
+            switches.append(net.addSwitch(f"s{i}"))
 
-        # Links
-        # Connect each host to a switch in a round-robin manner
         for i in range(1, num_hosts + 1):
-            host = net.get(f"h{i}") 
-            # Connect the host to a switch, using TCLink for bandwidth and delay
+            net.addHost(f"h{i}")
+
+        for i in range(1, num_hosts + 1):
+            host = net.get(f"h{i}")
             net.addLink(host, switches[(i - 1) % num_switches], cls=TCLink, bw=bw_h, delay="10ms")
 
-        # Connect each switch to the next switch in a circular manner (ring topology)
-        for i in range(num_switches):
-            net.addLink(switches[i], switches[(i + 1) % num_switches], cls=TCLink, bw=bw_s, delay="5ms")
+        if link_type == "ring":
+            for i in range(num_switches):
+                net.addLink(switches[i], switches[(i + 1) % num_switches], cls=TCLink, bw=bw_s, delay="5ms")
+        elif link_type == "linear":
+            for i in range(num_switches - 1):
+                net.addLink(switches[i], switches[i + 1], cls=TCLink, bw=bw_s, delay="5ms")
+        else:
+            raise ValueError("Invalid link_type: choose 'ring' or 'linear'")
 
 
-def build_topology(topology_type, net):
-    """
-    Builds the selected network topology.
-    """
+def build_topology(topology_type, net, link_type="ring"):
+    topo = MyTopo()
     if topology_type == "simple":
-        topo = MyTopo()
-        topo.build(net, num_hosts=6, num_switches=4, bw_h=50, bw_s=100) 
+        topo.build(net, num_hosts=6, num_switches=4, bw_h=50, bw_s=100, link_type=link_type)
     elif topology_type == "complex":
-        topo = MyTopo()
-        topo.build(net, num_hosts=19, num_switches=7, bw_h=100, bw_s=150) 
+        topo.build(net, num_hosts=19, num_switches=7, bw_h=100, bw_s=150, link_type=link_type)
     else:
         raise ValueError(f"Unknown topology type: {topology_type}")
 
@@ -55,8 +51,9 @@ class NetworkManager:
     """
     Manages the Mininet network, Ryu controller and service deployment GUI.
     """
-    def __init__(self, topology_type):
+    def __init__(self, topology_type, link_type="ring"):
         self.topology_type = topology_type
+        self.link_type = link_type
         self.net = None
         self.service_manager = ServiceManager()
         self.flow_modification_queue = self.service_manager.get_flow_queue()
@@ -75,7 +72,7 @@ class NetworkManager:
             self.net = Mininet(switch=OVSKernelSwitch, link=TCLink, build=False)
             
             info("[INFO] Building network topology...\n")
-            build_topology(self.topology_type, self.net)
+            build_topology(self.topology_type, self.net, link_type=self.link_type)
             self.net.addController(controller) 
 
             info("[INFO] Starting the network...\n")

@@ -263,19 +263,31 @@ class ServiceManager:
                 break
 
     def wait_for_file_content(self, host, filepath, timeout=20, interval=0.5):
-            waited = 0
-            while waited < timeout:
-                check = host.cmd(f"test -s {filepath} && echo 'exists'").strip()
-                print(f"[DEBUG] wait_for_file_content: waited={waited}, test output='{check}'")
-                if check == "exists":
-                    content = host.cmd(f"cat {filepath}").strip()
-                    print(f"[DEBUG] wait_for_file_content: read content='{content}'")
-                    # Escludi "exists" come contenuto valido
-                    if content and content != "exists":
-                        return content
-                time.sleep(interval)
-                waited += interval
-            return None
+        waited = 0
+        last_valid = None
+        stability_count = 0
+
+        while waited < timeout:
+            # Legge il contenuto del file se esiste, altrimenti restituisce ""
+            content = host.cmd(f"cat {filepath} 2>/dev/null || echo ''").strip()
+
+            # Accetta solo contenuto "non vuoto"
+            if content:
+                if content == last_valid:
+                    stability_count += 1
+                else:
+                    last_valid = content
+                    stability_count = 0
+
+                # Se il contenuto rimane stabile per 2 cicli consecutivi (1s), accettalo
+                if stability_count >= 2:
+                    return content
+
+            time.sleep(interval)
+            waited += interval
+
+        return None  # Timeout raggiunto senza contenuto stabile
+    
     
     def test_service(self, service_key_to_test):
         test_results = {}
